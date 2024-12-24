@@ -15,33 +15,20 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
-const formSchema = z.object({
-  username: z
-    .string()
-    .min(8, {
-      message: "Username is required must contain at least 8 character(s)",
-    })
-    .max(50),
-  password: z
-    .string()
-    .min(8, {
-      message: "Password is required must contain at least 8 character(s)",
-    })
-    .max(31),
-});
+import { loginSchema } from "@/schemas";
+import { signIn } from "@/auth";
 
 const Login = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+  const onSubmit = (values: z.infer<typeof loginSchema>) => {
+    signIn("credentials", { data: values, redirectTo: "/memoryApp" });
   };
 
   return (
@@ -50,12 +37,12 @@ const Login = () => {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
             control={form.control}
-            name="username"
+            name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Username</FormLabel>
+                <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input type=" email" {...field} />
+                  <Input type="email" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
