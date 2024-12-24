@@ -17,12 +17,12 @@ const Header = ({ homeHref }: { homeHref: string }) => {
       </h1>
       <nav>
         <ul className="flex items-center justify-center uppercase">
-          <li className="hover:bg-gray-50 p-2">
-            <Link href="/memoryApp/login/">Login</Link>
-          </li>
-          <li className="hover:bg-gray-50 p-2">
-            <Link href="/memoryApp/register/">register</Link>
-          </li>
+          <Link href="/memoryApp/login/">
+            <li className="hover:bg-gray-50 p-2">Login</li>
+          </Link>
+          <Link href="/memoryApp/register/">
+            <li className="hover:bg-gray-50 p-2">register</li>
+          </Link>
         </ul>
       </nav>
     </div>
