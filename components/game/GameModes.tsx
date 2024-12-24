@@ -2,7 +2,7 @@ import GameCard from "./GameCard";
 
 const GameModes = () => {
   return (
-    <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 justify-center w-full max-w-[1200px] mx-auto">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 justify-center w-full max-w-[1200px] mx-auto">
       <GameCard
         imageSrc="/pictures_of_game_modes/event_numbers.png"
         imageAlt="Picture of numbers"
