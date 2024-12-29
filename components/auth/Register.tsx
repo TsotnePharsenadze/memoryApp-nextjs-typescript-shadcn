@@ -14,22 +14,53 @@ import { Input } from "@/components/ui/input";
 import { registerSchema } from "@/schemas";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { FaSpinner } from "react-icons/fa";
+
 const Register = () => {
+  const [isLoading, setIsLoading] = useState(false);
+
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       username: "",
+      surname: "",
+      name: "",
       email: "",
       password: "",
       confirmPassword: "",
     },
   });
 
-  const onSubmit = (values: z.infer<typeof registerSchema>) => {
-    console.log(values);
+  const onSubmit = async (values: z.infer<typeof registerSchema>) => {
+    if (values.password !== values.confirmPassword) {
+      form.setError("confirmPassword", { message: "Passwords don't match" });
+      form.setError("password", { message: "Passwords don't match" });
+      return null;
+    }
+    setIsLoading(true);
+    await fetch("/api/register", {
+      method: "POST",
+      body: JSON.stringify(values),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.field == "password") {
+          form.setError("password", { message: data.error });
+          form.setError("confirmPassword", { message: data.error });
+        }
+        form.setError(data.field, { message: data.error });
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => setIsLoading(false));
   };
 
   return (
@@ -64,6 +95,23 @@ const Register = () => {
           />
           <FormField
             control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Username</FormLabel>
+                <FormControl>
+                  <Input type="text" {...field} />
+                </FormControl>
+                {form.formState.errors["username"] ? (
+                  <FormMessage />
+                ) : (
+                  <FormDescription>You can change it later</FormDescription>
+                )}
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
             name="email"
             render={({ field }) => (
               <FormItem>
@@ -71,10 +119,13 @@ const Register = () => {
                 <FormControl>
                   <Input type="email" {...field} />
                 </FormControl>
-                <FormDescription>
-                  Your email to receive verification code
-                </FormDescription>
-                <FormMessage />
+                {form.formState.errors["email"] ? (
+                  <FormMessage />
+                ) : (
+                  <FormDescription>
+                    Your email to receive verification code
+                  </FormDescription>
+                )}
               </FormItem>
             )}
           />
@@ -98,17 +149,19 @@ const Register = () => {
               <FormItem>
                 <FormLabel>Confirm Password</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="********"
-                    type="confirmPassword"
-                    {...field}
-                  />
+                  <Input placeholder="********" type="password" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <Button>Register</Button>
+          <Button
+            type="submit"
+            className={`max-w-[84px] w-full text-center`}
+            disabled={isLoading}
+          >
+            {isLoading ? <FaSpinner className="animate-spin" /> : "Register"}
+          </Button>
         </form>
       </Form>
     </div>
