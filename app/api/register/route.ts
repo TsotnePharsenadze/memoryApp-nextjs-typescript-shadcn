@@ -18,12 +18,12 @@ export async function POST(req: Request) {
         { status: 401 }
       );
     }
-    
+
     const currentUser = await auth();
     if (currentUser?.user?.id) {
       return NextResponse.redirect(new URL("/memoryApp"));
     }
-    const findEmail = await prisma.user.findUnique({
+    const findEmail = await prisma.user.findFirst({
       where: {
         email: email as string,
       },

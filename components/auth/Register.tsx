@@ -12,12 +12,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { registerSchema } from "@/schemas";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
 import { FaSpinner } from "react-icons/fa";
 import Error from "../Error";
 import { isObjectEmpty } from "@/lib/utils";
@@ -46,31 +44,36 @@ const Register = () => {
       form.setError("password", { message: "Passwords don't match" });
       return null;
     }
+
     setIsLoading(true);
-    await fetch("/api/register", {
-      method: "POST",
-      body: JSON.stringify(values),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
+    setError(false);
+
+    try {
+      const response = await fetch("/api/register", {
+        method: "POST",
+        body: JSON.stringify(values),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+
+      if (data.field) {
         if (data.field == "password") {
           form.setError("password", { message: data.error });
           form.setError("confirmPassword", { message: data.error });
         }
         form.setError(data.field, { message: data.error });
-      })
-      .catch((error) => {
-        setError(true);
-      })
-      .finally(() => {
-        setIsLoading(false);
-        if (!error && isObjectEmpty(form.formState.errors)) {
-          router.push("/memoryApp/login");
-        }
-      });
+      }
+
+      if (isObjectEmpty(form.formState.errors) && !error) {
+        router.push("/memoryApp/login");
+      }
+    } catch (err) {
+      setError(true);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
