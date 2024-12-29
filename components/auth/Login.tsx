@@ -16,9 +16,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { loginSchema } from "@/schemas";
-import { signIn } from "@/auth";
+import { signIn } from "next-auth/react";
+import { useState } from "react";
+import { FaSpinner } from "react-icons/fa";
+import Error from "../Error";
 
 const Login = () => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<null | string>(null);
+
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -27,8 +33,24 @@ const Login = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof loginSchema>) => {
-    signIn("credentials", { data: values, redirectTo: "/memoryApp" });
+  const onSubmit = async (values: z.infer<typeof loginSchema>) => {
+    setIsLoading(true);
+    try {
+      const result = await signIn("credentials", {
+        redirect: false,
+        email: values.email,
+        password: values.password,
+      });
+
+      if (result?.error) {
+        setError(result.error);
+        console.log(result);
+      } else {
+        window.location.href = "/memoryApp";
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -61,7 +83,12 @@ const Login = () => {
               </FormItem>
             )}
           />
-          <Button>Login</Button>
+          {error && (
+            <Error error="Either email or password (or both) was incorrect!" />
+          )}
+          <Button className={`max-w-[84px] w-full text-center`}>
+            {isLoading ? <FaSpinner className="animate-spin" /> : "Login"}
+          </Button>
         </form>
       </Form>
     </div>

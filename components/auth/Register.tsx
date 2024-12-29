@@ -19,9 +19,14 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { FaSpinner } from "react-icons/fa";
+import Error from "../Error";
+import { isObjectEmpty } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
@@ -58,9 +63,14 @@ const Register = () => {
         form.setError(data.field, { message: data.error });
       })
       .catch((error) => {
-        console.log(error);
+        setError(true);
       })
-      .finally(() => setIsLoading(false));
+      .finally(() => {
+        setIsLoading(false);
+        if (!error && isObjectEmpty(form.formState.errors)) {
+          router.push("/memoryApp/login");
+        }
+      });
   };
 
   return (
@@ -155,6 +165,7 @@ const Register = () => {
               </FormItem>
             )}
           />
+          {error && <Error error="Something went wrong, try again later!" />}
           <Button
             type="submit"
             className={`max-w-[84px] w-full text-center`}

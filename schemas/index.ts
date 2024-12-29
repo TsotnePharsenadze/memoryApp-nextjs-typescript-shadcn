@@ -19,13 +19,13 @@ export const registerSchema = z.object({
     }),
   email: z
     .string()
-    .email()
     .min(3, {
       message: "Email is required must contain at least 3 character(s)",
     })
     .max(50, {
       message: "Email must contain less than 51 character(s)",
-    }),
+    })
+    .email(),
   username: z
     .string()
     .min(8, {
