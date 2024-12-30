@@ -20,9 +20,11 @@ export async function POST(req: Request) {
     }
 
     const currentUser = await auth();
+
     if (currentUser?.user?.id) {
-      return NextResponse.redirect(new URL("/memoryApp"));
+      return null;
     }
+
     const findEmail = await prisma.user.findFirst({
       where: {
         email: email as string,

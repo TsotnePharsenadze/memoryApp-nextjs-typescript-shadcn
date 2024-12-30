@@ -22,7 +22,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           const { email, password } = await loginSchema.parseAsync(credentials);
 
-          const user = await prisma.user.findUnique({
+          const user = await prisma.user.findFirst({
             where: {
               email: email,
             },
@@ -31,10 +31,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           if (!user || !user.hashedPassword) {
             return null;
           }
-
+          console.log(password, user.hashedPassword);
           const comparePasswords = await bcrypt.compare(
-            password,
-            user.hashedPassword
+            password as string,
+            user.hashedPassword as string
           );
 
           if (!comparePasswords) {

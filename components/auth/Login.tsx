@@ -34,6 +34,7 @@ const Login = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
+    setError(null);
     setIsLoading(true);
     try {
       const result = await signIn("credentials", {
@@ -44,7 +45,6 @@ const Login = () => {
 
       if (result?.error) {
         setError(result.error);
-        console.log(result);
       } else {
         window.location.href = "/memoryApp";
       }

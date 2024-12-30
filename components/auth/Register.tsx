@@ -17,13 +17,13 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { FaSpinner } from "react-icons/fa";
-import Error from "../Error";
+import ErrorComponent from "../Error";
 import { isObjectEmpty } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 
 const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [customError, setCustomError] = useState(false);
   const router = useRouter();
 
   const form = useForm<z.infer<typeof registerSchema>>({
@@ -46,7 +46,7 @@ const Register = () => {
     }
 
     setIsLoading(true);
-    setError(false);
+    setCustomError(false);
 
     try {
       const response = await fetch("/api/register", {
@@ -56,6 +56,7 @@ const Register = () => {
           "Content-Type": "application/json",
         },
       });
+
       const data = await response.json();
 
       if (data.field) {
@@ -65,12 +66,14 @@ const Register = () => {
         }
         form.setError(data.field, { message: data.error });
       }
-
-      if (isObjectEmpty(form.formState.errors) && !error) {
+      if (data.error) {
+        throw new Error("Something went wrong");
+      }
+      if (isObjectEmpty(form.formState.errors) && !data.error) {
         router.push("/memoryApp/login");
       }
     } catch (err) {
-      setError(true);
+      setCustomError(true);
     } finally {
       setIsLoading(false);
     }
@@ -168,7 +171,9 @@ const Register = () => {
               </FormItem>
             )}
           />
-          {error && <Error error="Something went wrong, try again later!" />}
+          {customError && (
+            <ErrorComponent error="Something went wrong, try again later!" />
+          )}
           <Button
             type="submit"
             className={`max-w-[84px] w-full text-center`}
