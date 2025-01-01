@@ -1,5 +1,6 @@
 "use client";
 
+import Spinner from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
 import {
   Carousel,
@@ -13,6 +14,7 @@ import { useState } from "react";
 function ImagesGame() {
   const [imagesToDisplay, setImagesToDisplay] = useState<string[]>([]);
   const [amountOfImages, setAmountOfImages] = useState<number>(10);
+  const [isLoadingImages, setIsLoadingImages] = useState<boolean>(false);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [slideIndex, setSlideIndex] = useState<number>(1);
   const [gameStatus, setGameStatus] = useState<number>(0);
@@ -44,12 +46,14 @@ function ImagesGame() {
       const blob = await response.blob();
       return URL.createObjectURL(blob);
     });
-
+    setIsLoadingImages(true);
     try {
       const fetchedImages = await Promise.all(imagePromises);
       setImagesToDisplay(fetchedImages);
     } catch (error) {
       console.error("Error fetching images:", error);
+    } finally {
+      setIsLoadingImages(false);
     }
   };
 
@@ -114,7 +118,7 @@ function ImagesGame() {
 
   return (
     <div className="bg-blue-50 h-screen p-6 flex flex-col items-center">
-      {gameStatus === 0 && (
+      {gameStatus === 0 && !isLoadingImages && (
         <div className="bg-white p-6 shadow rounded-lg w-full max-w-md">
           <label className="block text-gray-600 mb-2">Number of items:</label>
           <select
@@ -133,6 +137,7 @@ function ImagesGame() {
           </Button>
         </div>
       )}
+      {isLoadingImages && <Spinner />}
 
       {gameStatus === 1 && (
         <div className="bg-white p-6 shadow rounded-lg w-full max-w-md text-center">
