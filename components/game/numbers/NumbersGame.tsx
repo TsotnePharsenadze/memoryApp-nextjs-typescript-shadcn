@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useRef, useState } from "react";
 
 function NumbersGame() {
@@ -129,7 +130,7 @@ function NumbersGame() {
   };
 
   return (
-    <div className="bg-blue-50 h-screen p-6 overflow-y-auto flex flex-col items-center">
+    <div className="bg-blue-50 h-screen p-6 flex flex-col items-center">
       {gameStatus === 0 && (
         <div className="bg-white p-6 shadow rounded-lg w-full max-w-md">
           <label className="block text-gray-600 mb-2">Number of items:</label>
@@ -143,13 +144,9 @@ function NumbersGame() {
             <option>70</option>
             <option>90</option>
           </select>
-
-          <button
-            onClick={startGame}
-            className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
-          >
+          <Button size="full" onClick={startGame}>
             Start Game
-          </button>
+          </Button>
         </div>
       )}
 
@@ -165,12 +162,9 @@ function NumbersGame() {
               </div>
             ))}
           </div>
-          <button
-            onClick={recite}
-            className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600"
-          >
+          <Button size="full" onClick={recite}>
             Recite
-          </button>
+          </Button>
         </div>
       )}
 
@@ -249,12 +243,9 @@ function NumbersGame() {
               ))}
             </div>
           </div>
-          <button
-            onClick={resetGame}
-            className="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600"
-          >
+          <Button size="full" onClick={resetGame}>
             Restart
-          </button>
+          </Button>
         </div>
       )}
     </div>
