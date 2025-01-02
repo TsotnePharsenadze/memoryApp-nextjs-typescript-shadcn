@@ -201,8 +201,17 @@ function CardsGame() {
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              <CarouselPrevious />
-              <span onClick={changeCursor}>
+              <span
+                className="absolute top-1/2 traslate-y-1/2"
+                style={{ left: "10px" }}
+              >
+                <CarouselPrevious />
+              </span>
+              <span
+                onClick={changeCursor}
+                className="absolute top-1/2 traslate-y-1/2"
+                style={{ right: "10px" }}
+              >
                 <CarouselNext />
               </span>
             </Carousel>

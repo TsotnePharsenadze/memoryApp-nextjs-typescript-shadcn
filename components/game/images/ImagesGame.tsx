@@ -137,13 +137,13 @@ function ImagesGame() {
           </Button>
         </div>
       )}
-      
+
       {isLoadingImages && <Spinner />}
 
       {gameStatus === 1 && (
         <div className="bg-white p-6 shadow rounded-lg w-full sm:max-w-md text-center">
           <div className="grid grid-cols-1 gap-4 justify-items-center mb-4">
-          <Carousel className="max-w-xs ">
+            <Carousel className="max-w-xs ">
               <CarouselContent>
                 {imagesToDisplay.map((image, index) => (
                   <CarouselItem key={index}>
@@ -156,8 +156,17 @@ function ImagesGame() {
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              <CarouselPrevious />
-              <span onClick={changeCursor}>
+              <span
+                className="absolute top-1/2 traslate-y-1/2"
+                style={{ left: "10px" }}
+              >
+                <CarouselPrevious />
+              </span>
+              <span
+                onClick={changeCursor}
+                className="absolute top-1/2 traslate-y-1/2"
+                style={{ right: "10px" }}
+              >
                 <CarouselNext />
               </span>
             </Carousel>
