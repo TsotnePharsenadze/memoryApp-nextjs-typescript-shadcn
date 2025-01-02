@@ -31,7 +31,7 @@ export default function RootLayout({
       >
         <SessionProvider>
           <Header homeHref="/" />
-          <div className="min-h-screen p-6">{children}</div>
+          <div className="min-h-screen p-2 sm:p-6">{children}</div>
         </SessionProvider>
       </body>
     </html>

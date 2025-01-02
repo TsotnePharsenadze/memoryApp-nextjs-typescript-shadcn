@@ -130,7 +130,7 @@ function NumbersGame() {
   };
 
   return (
-    <div className="bg-blue-50 h-screen p-6 flex flex-col items-center">
+    <div className="bg-blue-50 h-screen sm:p-6 flex flex-col items-center">
       {gameStatus === 0 && (
         <div className="bg-white p-6 shadow rounded-lg w-full max-w-md">
           <label className="block text-gray-600 mb-2">Number of items:</label>
@@ -208,7 +208,7 @@ function NumbersGame() {
             <p className="text-gray-700 break-words">
               <b>Your Sequence of numbers: </b>
             </p>
-            <div className="flex justify-center items-center gap-2 flex-wrap">
+            <div className="flex justify-center items-center gap-2 flex-wrap max-h-[300px] overflow-y-auto">
               {numbersUserPicked.map((number, index) => (
                 <span
                   key={index}
@@ -231,7 +231,7 @@ function NumbersGame() {
             </p>
             <div
               id="originalSequenceOfNumbers"
-              className="flex justify-center items-center gap-2 flex-wrap"
+              className="flex justify-center items-center gap-2 flex-wrap max-h-[300px] overflow-y-auto"
             >
               {numbersToDisplay.map((number, index) => (
                 <span

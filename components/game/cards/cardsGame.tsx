@@ -9,9 +9,65 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import Image from "next/image";
 import { useState } from "react";
 
-function ImagesGame() {
+const imagePaths = [
+  "2C.svg",
+  "2D.svg",
+  "2H.svg",
+  "2S.svg",
+  "3C.svg",
+  "3D.svg",
+  "3H.svg",
+  "3S.svg",
+  "4C.svg",
+  "4D.svg",
+  "4H.svg",
+  "4S.svg",
+  "5C.svg",
+  "5D.svg",
+  "5H.svg",
+  "5S.svg",
+  "6C.svg",
+  "6D.svg",
+  "6H.svg",
+  "6S.svg",
+  "7C.svg",
+  "7D.svg",
+  "7H.svg",
+  "7S.svg",
+  "8C.svg",
+  "8D.svg",
+  "8H.svg",
+  "8S.svg",
+  "9C.svg",
+  "9D.svg",
+  "9H.svg",
+  "9S.svg",
+  "AC.svg",
+  "AD.svg",
+  "AH.svg",
+  "AS.svg",
+  "JC.svg",
+  "JD.svg",
+  "JH.svg",
+  "JS.svg",
+  "KC.svg",
+  "KD.svg",
+  "KH.svg",
+  "KS.svg",
+  "QC.svg",
+  "QD.svg",
+  "QH.svg",
+  "QS.svg",
+  "TC.svg",
+  "TD.svg",
+  "TH.svg",
+  "TS.svg",
+];
+
+function CardsGame() {
   const [imagesToDisplay, setImagesToDisplay] = useState<string[]>([]);
   const [amountOfImages, setAmountOfImages] = useState<number>(10);
   const [isLoadingImages, setIsLoadingImages] = useState<boolean>(false);
@@ -25,41 +81,28 @@ function ImagesGame() {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
   const [imagesUserPicked, setImagesUserPicked] = useState<string[]>([]);
-  const API_KEY = process.env.NEXT_PUBLIC_API_NINJA_KEY;
 
-  const fetchImages = async () => {
-    const imagePromises = Array.from({ length: amountOfImages }, async () => {
-      const response = await fetch(
-        "https://api.api-ninjas.com/v1/randomimage",
-        {
-          headers: {
-            "X-Api-Key": API_KEY!,
-            Accept: "image/jpg",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch images");
-      }
-
-      const blob = await response.blob();
-      return URL.createObjectURL(blob);
-    });
+  const loadImages = () => {
     setIsLoadingImages(true);
     try {
-      const fetchedImages = await Promise.all(imagePromises);
-      setImagesToDisplay(fetchedImages);
+      const selectedImages = [];
+      for (let i = 0; i < amountOfImages; i++) {
+        const randomImage =
+          imagePaths[Math.floor(Math.random() * imagePaths.length)];
+        selectedImages.push(`/cards/${randomImage}`);
+      }
+
+      setImagesToDisplay(selectedImages);
     } catch (error) {
-      console.error("Error fetching images:", error);
+      console.error("Error loading images:", error);
     } finally {
       setIsLoadingImages(false);
     }
   };
 
-  const startGame = async (e: React.FormEvent): Promise<void> => {
+  const startGame = (e: React.FormEvent): void => {
     e.preventDefault();
-    await fetchImages();
+    loadImages();
     setGameStatus(1);
     setStartTime(Date.now());
   };
@@ -137,21 +180,23 @@ function ImagesGame() {
           </Button>
         </div>
       )}
-      
+
       {isLoadingImages && <Spinner />}
 
       {gameStatus === 1 && (
         <div className="bg-white p-6 shadow rounded-lg w-full sm:max-w-md text-center">
           <div className="grid grid-cols-1 gap-4 justify-items-center mb-4">
-          <Carousel className="max-w-xs ">
+            <Carousel className="max-w-xs ">
               <CarouselContent>
                 {imagesToDisplay.map((image, index) => (
                   <CarouselItem key={index}>
-                    <img
+                    <Image
                       key={index}
                       src={image}
+                      width={230}
+                      height={230}
                       alt="Memorize this"
-                      className="h-[300px] w-[300px] rounded mx-auto"
+                      className=" rounded mx-auto"
                     />
                   </CarouselItem>
                 ))}
@@ -250,4 +295,4 @@ function ImagesGame() {
   );
 }
 
-export default ImagesGame;
+export default CardsGame;

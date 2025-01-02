@@ -3,7 +3,7 @@ import ImagesGame from "@/components/game/images/ImagesGame";
 
 const ImagesPage = () => {
   return (
-    <div className="max-w-md mx-auto">
+    <div className="sm:max-w-md mx-auto">
       <GameTitle title="Images" subtitle="Memorize random images" />
       <ImagesGame />
     </div>
