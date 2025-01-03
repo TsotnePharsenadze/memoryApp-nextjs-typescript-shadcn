@@ -59,6 +59,7 @@ function WordsGame() {
   const recite = (): void => {
     setGameStatus(2);
     setCurrentIndex(0);
+    setEndTime(Date.now());
   };
 
   const generateOptions = (correctWord: string): string[] => {
@@ -81,7 +82,6 @@ function WordsGame() {
       setCurrentIndex((prevIndex) => prevIndex + 1);
     } else {
       setGameStatus(3);
-      setEndTime(Date.now());
     }
   };
 

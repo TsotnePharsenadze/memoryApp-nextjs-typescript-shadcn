@@ -59,6 +59,7 @@ function NumbersGame() {
   const recite = (): void => {
     setGameStatus(2);
     setCurrentIndex(0);
+    setEndTime(Date.now());
   };
 
   const generateOptions = (correctNumber: string): string[] => {
@@ -84,7 +85,6 @@ function NumbersGame() {
       setCurrentIndex((prevIndex) => prevIndex + 1);
     } else {
       setGameStatus(3);
-      setEndTime(Date.now());
     }
   };
 

@@ -67,6 +67,7 @@ function ImagesGame() {
   const recite = (): void => {
     setGameStatus(2);
     setCurrentIndex(0);
+    setEndTime(Date.now());
   };
 
   const generateOptions = (correctImage: string): string[] => {
@@ -89,7 +90,6 @@ function ImagesGame() {
       setCurrentIndex((prevIndex) => prevIndex + 1);
     } else {
       setGameStatus(3);
-      setEndTime(Date.now());
     }
   };
 
@@ -120,7 +120,7 @@ function ImagesGame() {
     <div className="bg-blue-50 h-screen sm:p-6 flex flex-col items-center">
       {gameStatus === 0 && !isLoadingImages && (
         <div className="bg-white p-6 shadow rounded-lg w-full max-w-md">
-          <label className="block text-gray-600 mb-2">Number of items:</label>
+          <label className="block text-gray-600 mb-2">Number of Images:</label>
           <select
             onChange={handleAmountOfImages}
             className="w-full border border-gray-300 rounded p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"

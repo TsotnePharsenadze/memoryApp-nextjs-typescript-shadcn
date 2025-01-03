@@ -110,6 +110,7 @@ function CardsGame() {
   const recite = (): void => {
     setGameStatus(2);
     setCurrentIndex(0);
+    setEndTime(Date.now());
   };
 
   const generateOptions = (correctImage: string): string[] => {
@@ -132,7 +133,6 @@ function CardsGame() {
       setCurrentIndex((prevIndex) => prevIndex + 1);
     } else {
       setGameStatus(3);
-      setEndTime(Date.now());
     }
   };
 
