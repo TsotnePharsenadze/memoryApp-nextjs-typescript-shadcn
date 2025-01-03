@@ -172,11 +172,7 @@ function ImagesGame() {
             </Carousel>
           </div>
 
-          <Button
-            size="full"
-            onClick={recite}
-            disabled={slideIndex != amountOfImages}
-          >
+          <Button size="full" onClick={recite}>
             Recite
           </Button>
         </div>

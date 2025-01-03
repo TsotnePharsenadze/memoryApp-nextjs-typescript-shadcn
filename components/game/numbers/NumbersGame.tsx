@@ -2,6 +2,14 @@
 
 import { Button } from "@/components/ui/button";
 import { useRef, useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { RxQuestionMarkCircled } from "react-icons/rx";
 
 function NumbersGame() {
   const shuffleArray = (array: string[]): string[] => {
@@ -24,6 +32,11 @@ function NumbersGame() {
 
   const [numbersToDisplay, setNumbersToDisplay] = useState<string[]>([]);
   const [amountOfNumbers, setAmountOfNumbers] = useState<number>(10);
+  const amountOfNumbersRef = useRef(null);
+
+  const [isCustom, setIsCustom] = useState<boolean>(false);
+  const [isUnique, setIsUnique] = useState<boolean>(false);
+  const isUniqueCheckBoxRef = useRef(null);
 
   const [currentIndex, setCurrentIndex] = useState<number>(0);
 
@@ -43,16 +56,45 @@ function NumbersGame() {
     e.preventDefault();
     setGameStatus(1);
     setStartTime(Date.now());
+    if (isCustom) {
+      if (!isUnique) {
+        shuffledList.current = generateInitialNumbers();
+        const array = Array.from({ length: amountOfNumbers }, () => {
+          const randomIndex = Math.floor(
+            Math.random() * shuffledList.current.length
+          );
+          return shuffledList.current[randomIndex];
+        });
+        setNumbersToDisplay(array);
+      } else {
+        let array: any[] | ((prevState: string[]) => string[]) = [];
+        let remainingNumbers = amountOfNumbers;
 
-    const array = shuffledList.current.slice(0, amountOfNumbers);
-    setNumbersToDisplay(array);
+        while (remainingNumbers > 0) {
+          if (shuffledList.current.length === 0) {
+            shuffledList.current = generateInitialNumbers();
+          }
 
-    shuffledList.current.splice(0, amountOfNumbers);
-    if (
-      shuffledList.current.length <= 0 ||
-      shuffledList.current.length - amountOfNumbers <= 0
-    ) {
-      shuffledList.current = generateInitialNumbers();
+          const batchSize = Math.min(
+            remainingNumbers,
+            110,
+            shuffledList.current.length
+          );
+          array = array.concat(shuffledList.current.slice(0, batchSize));
+          shuffledList.current.splice(0, batchSize);
+          remainingNumbers -= batchSize;
+        }
+
+        setNumbersToDisplay(array);
+      }
+    } else {
+      if (shuffledList.current.length < amountOfNumbers) {
+        shuffledList.current = generateInitialNumbers();
+      }
+
+      const array = shuffledList.current.slice(0, amountOfNumbers);
+      setNumbersToDisplay(array);
+      shuffledList.current.splice(0, amountOfNumbers);
     }
   };
 
@@ -120,12 +162,22 @@ function NumbersGame() {
     const value = e.target.value;
     if (!/^\d*$/.test(value)) return;
     const number = Number(value);
-    if (number >= 10 && number <= 90) {
-      setAmountOfNumbers(number);
-    } else if (number <= 10) {
-      setAmountOfNumbers(10);
-    } else if (number >= 90) {
-      setAmountOfNumbers(90);
+    if (isCustom) {
+      if (number > 0 && number <= 10000) {
+        setAmountOfNumbers(number);
+      } else if (number <= 0) {
+        setAmountOfNumbers(1);
+      } else if (number >= 10000) {
+        setAmountOfNumbers(10000);
+      }
+    } else {
+      if (number >= 10 && number <= 90) {
+        setAmountOfNumbers(number);
+      } else if (number <= 10) {
+        setAmountOfNumbers(10);
+      } else if (number >= 90) {
+        setAmountOfNumbers(90);
+      }
     }
   };
 
@@ -133,17 +185,91 @@ function NumbersGame() {
     <div className="bg-blue-50 h-screen sm:p-6 flex flex-col items-center">
       {gameStatus === 0 && (
         <div className="bg-white p-6 shadow rounded-lg w-full max-w-md">
-          <label className="block text-gray-600 mb-2">Number of items:</label>
-          <select
-            onChange={handleAmountOfNumbers}
-            className="w-full border border-gray-300 rounded p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          >
-            <option>10</option>
-            <option>30</option>
-            <option>50</option>
-            <option>70</option>
-            <option>90</option>
-          </select>
+          <Tabs defaultValue="leaderboard" className="w-full text-center">
+            <TabsList>
+              <TabsTrigger
+                value="leaderboard"
+                onClick={() => setIsCustom(false)}
+              >
+                for Leaderboard
+              </TabsTrigger>
+              <TabsTrigger value="custom" onClick={() => setIsCustom(true)}>
+                Custom
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="leaderboard">
+              <div>
+                <label
+                  className="block text-gray-600 mb-2 text-left"
+                  htmlFor="selectAmount"
+                >
+                  Number of unique items
+                  <i className="text-xs text-gray-400"> (00-09, 0-9, 10-99)</i>:
+                </label>
+                <select
+                  id="selectAmount"
+                  onChange={handleAmountOfNumbers}
+                  className="w-full border border-gray-300 rounded p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                >
+                  <option>10</option>
+                  <option>30</option>
+                  <option>50</option>
+                  <option>70</option>
+                  <option>90</option>
+                </select>
+              </div>
+            </TabsContent>
+            <TabsContent value="custom">
+              <div className="mb-4">
+                <label
+                  className="block text-gray-600 mb-2 text-left"
+                  htmlFor="inputAmount"
+                >
+                  Number of items
+                  <i className="text-xs text-gray-400"> (00-09, 0-9, 10-99)</i>:
+                </label>
+                <input
+                  id="inputAmount"
+                  type="number"
+                  max="110"
+                  min="1"
+                  value={amountOfNumbers}
+                  ref={amountOfNumbersRef}
+                  onChange={handleAmountOfNumbers}
+                  className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+              <div className="mb-4 flex gap-2 items-center">
+                <input
+                  type="checkbox"
+                  id="unique"
+                  ref={isUniqueCheckBoxRef}
+                  onChange={() => setIsUnique((prev) => !prev)}
+                  checked={isUnique}
+                />
+                <label
+                  htmlFor="unique"
+                  className="block text-gray-600 text-left relative"
+                >
+                  Unique{" "}
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <RxQuestionMarkCircled />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <i className="text-xs text-gray-200">
+                          {" "}
+                          if number of items is over 110 -- [00-09, 0-9, 10-99]
+                          -- will be repeated at random
+                        </i>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </label>
+              </div>
+            </TabsContent>
+          </Tabs>
           <Button size="full" onClick={startGame}>
             Start Game
           </Button>
