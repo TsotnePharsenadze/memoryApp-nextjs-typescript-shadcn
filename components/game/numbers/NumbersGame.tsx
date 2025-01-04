@@ -185,7 +185,10 @@ function NumbersGame() {
     <div className="bg-blue-50 h-screen sm:p-6 flex flex-col items-center">
       {gameStatus === 0 && (
         <div className="bg-white p-6 shadow rounded-lg w-full max-w-md">
-          <Tabs defaultValue="leaderboard" className="w-full text-center">
+          <Tabs
+            defaultValue={`${isCustom ? "custom" : "leaderboard"}`}
+            className="w-full text-center"
+          >
             <TabsList>
               <TabsTrigger
                 value="leaderboard"

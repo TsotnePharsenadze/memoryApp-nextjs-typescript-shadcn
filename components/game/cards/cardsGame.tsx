@@ -9,8 +9,16 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import Image from "next/image";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { RxQuestionMarkCircled } from "react-icons/rx";
 
 const imagePaths = [
   "2C.svg",
@@ -72,6 +80,8 @@ function CardsGame() {
   const [amountOfImages, setAmountOfImages] = useState<number>(10);
   const [isLoadingImages, setIsLoadingImages] = useState<boolean>(false);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [isCustom, setIsCustom] = useState<boolean>(false);
+  const [isUnique, setIsUnique] = useState<boolean>(false);
   const [slideIndex, setSlideIndex] = useState<number>(1);
   const [gameStatus, setGameStatus] = useState<number>(0);
   const [score, setScore] = useState<{ correct: number; incorrect: number }>({
@@ -82,14 +92,44 @@ function CardsGame() {
   const [endTime, setEndTime] = useState<number | null>(null);
   const [imagesUserPicked, setImagesUserPicked] = useState<string[]>([]);
 
+  const amountOfImagesRef = useRef(null);
+  const isUniqueCheckBoxRef = useRef(null);
+
   const loadImages = () => {
     setIsLoadingImages(true);
     try {
       const selectedImages = [];
-      for (let i = 0; i < amountOfImages; i++) {
-        const randomImage =
-          imagePaths[Math.floor(Math.random() * imagePaths.length)];
-        selectedImages.push(`/cards/${randomImage}`);
+      imagePaths.sort((a, b) => Math.random() - 0.5);
+      if (isCustom) {
+        if (isUnique) {
+          if (amountOfImages > 52) {
+            let tempImages = amountOfImages;
+            while (tempImages > 0) {
+              if (tempImages > 52) {
+                for (let i = 0; i < 52; i++) {
+                  selectedImages.push(`/cards/${imagePaths[i]}`);
+                  imagePaths.sort((a, b) => Math.random() - 0.5);
+                }
+              } else {
+                for (let i = 0; i < tempImages; i++) {
+                  selectedImages.push(`/cards/${imagePaths[i]}`);
+                  imagePaths.sort((a, b) => Math.random() - 0.5);
+                }
+              }
+              tempImages -= 52;
+            }
+          }
+        } else {
+          for (let i = 0; i < amountOfImages; i++) {
+            const randomImage =
+              imagePaths[Math.floor(Math.random() * imagePaths.length)];
+            selectedImages.push(`/cards/${randomImage}`);
+          }
+        }
+      } else {
+        for (let i = 0; i < amountOfImages; i++) {
+          selectedImages.push(`/cards/${imagePaths[i]}`);
+        }
       }
 
       setImagesToDisplay(selectedImages);
@@ -150,7 +190,23 @@ function CardsGame() {
     const value = e.target.value;
     if (!/^\d*$/.test(value)) return;
     const number = Number(value);
-    setAmountOfImages(Math.max(10, Math.min(90, number)));
+    if (isCustom) {
+      if (number > 0 && number <= 10000) {
+        setAmountOfImages(number);
+      } else if (number <= 0) {
+        setAmountOfImages(1);
+      } else if (number >= 10000) {
+        setAmountOfImages(10000);
+      }
+    } else {
+      if (number >= 15 && number <= 52) {
+        setAmountOfImages(number);
+      } else if (number <= 15) {
+        setAmountOfImages(15);
+      } else if (number >= 52) {
+        setAmountOfImages(52);
+      }
+    }
   };
 
   const changeCursor = () => {
@@ -163,18 +219,90 @@ function CardsGame() {
     <div className="bg-blue-50 h-screen sm:p-6 flex flex-col items-center">
       {gameStatus === 0 && !isLoadingImages && (
         <div className="bg-white p-6 shadow rounded-lg w-full max-w-md">
-          <label className="block text-gray-600 mb-2">Number of Cards:</label>
-          <select
-            onChange={handleAmountOfImages}
-            className="w-full border border-gray-300 rounded p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          <Tabs
+            defaultValue={`${isCustom ? "custom" : "leaderboard"}`}
+            className="w-full text-center"
           >
-            <option>10</option>
-            <option>30</option>
-            <option>50</option>
-            <option>70</option>
-            <option>90</option>
-          </select>
-
+            <TabsList>
+              <TabsTrigger
+                value="leaderboard"
+                onClick={() => setIsCustom(false)}
+              >
+                for Leaderboard
+              </TabsTrigger>
+              <TabsTrigger value="custom" onClick={() => setIsCustom(true)}>
+                Custom
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="leaderboard">
+              <div>
+                <label
+                  className="block text-gray-600 mb-2 text-left"
+                  htmlFor="selectAmount"
+                >
+                  Number of unique cards:
+                </label>
+                <select
+                  id="selectAmount"
+                  onChange={handleAmountOfImages}
+                  className="w-full border border-gray-300 rounded p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                >
+                  <option>15</option>
+                  <option>35</option>
+                  <option>52</option>
+                </select>
+              </div>
+            </TabsContent>
+            <TabsContent value="custom">
+              <div className="mb-4">
+                <label
+                  className="block text-gray-600 mb-2 text-left"
+                  htmlFor="inputAmount"
+                >
+                  Number of cards:
+                </label>
+                <input
+                  id="inputAmount"
+                  type="number"
+                  max="110"
+                  min="1"
+                  value={amountOfImages}
+                  ref={amountOfImagesRef}
+                  onChange={handleAmountOfImages}
+                  className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+              <div className="mb-4 flex gap-2 items-center">
+                <input
+                  type="checkbox"
+                  id="unique"
+                  ref={isUniqueCheckBoxRef}
+                  onChange={() => setIsUnique((prev) => !prev)}
+                  checked={isUnique}
+                />
+                <label
+                  htmlFor="unique"
+                  className="block text-gray-600 text-left relative"
+                >
+                  Unique{" "}
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <RxQuestionMarkCircled />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <i className="text-xs text-gray-200">
+                          {" "}
+                          if number of cards is over 52, deck will be repeated
+                          at random
+                        </i>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </label>
+              </div>
+            </TabsContent>
+          </Tabs>
           <Button size="full" onClick={startGame}>
             Start Game
           </Button>
