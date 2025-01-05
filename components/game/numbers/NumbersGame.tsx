@@ -106,7 +106,7 @@ function NumbersGame() {
 
   const generateOptions = (correctNumber: string): string[] => {
     const options = new Set<string>([correctNumber]);
-    while (options.size < 9) {
+    while (options.size < Math.min(amountOfNumbers, 9)) {
       const randomNumber =
         shuffledList.current[
           Math.floor(Math.random() * shuffledList.current.length)

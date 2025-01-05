@@ -155,7 +155,7 @@ function CardsGame() {
 
   const generateOptions = (correctImage: string): string[] => {
     const options = new Set<string>([correctImage]);
-    while (options.size < 9) {
+    while (options.size < Math.min(amountOfImages, 9)) {
       const randomImage =
         imagesToDisplay[Math.floor(Math.random() * imagesToDisplay.length)];
       options.add(randomImage);

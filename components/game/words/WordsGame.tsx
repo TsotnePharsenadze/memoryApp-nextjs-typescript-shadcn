@@ -1,14 +1,36 @@
 "use client";
 
 import Spinner from "@/components/Spinner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { RxQuestionMarkCircled } from "react-icons/rx";
+import { trackSynchronousRequestDataAccessInDev } from "next/dist/server/app-render/dynamic-rendering";
 
 function WordsGame() {
   const [wordsToDisplay, setWordsToDisplay] = useState<string[]>([]);
   const [amountOfWords, setAmountOfWords] = useState<number>(10);
   const [isLoadingWords, setIsLoadingWords] = useState<boolean>(false);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [isCustom, setIsCustom] = useState<boolean>(false);
+  const [types, setTypes] = useState<{
+    noun: boolean;
+    adverb: boolean;
+    adjective: boolean;
+    verb: boolean;
+  }>({
+    noun: false,
+    adverb: false,
+    adjective: false,
+    verb: false,
+  });
+
   const [gameStatus, setGameStatus] = useState<number>(0);
   const [score, setScore] = useState<{ correct: number; incorrect: number }>({
     correct: 0,
@@ -17,20 +39,33 @@ function WordsGame() {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
   const [wordsUserPicked, setWordsUserPicked] = useState<string[]>([]);
+
+  const amountOfWordsRef = useRef(null);
+  const typesNoun = useRef(null);
+  const typesAdverb = useRef(null);
+  const typesAdjective = useRef(null);
+  const typesVerb = useRef(null);
+
   const API_KEY = process.env.NEXT_PUBLIC_API_NINJA_KEY;
 
   const fetchRandomWords = async (amount: number) => {
     setIsLoadingWords(true);
     try {
       const wordPromises = Array.from({ length: amount }, async () => {
-        const response = await fetch(
-          "https://api.api-ninjas.com/v1/randomword",
-          {
-            headers: {
-              "X-Api-Key": API_KEY!,
-            },
-          }
-        );
+        let url = "https://api.api-ninjas.com/v1/randomword";
+        if (Object.values(types).includes(true)) {
+          url += "?type:";
+          Object.entries(types)
+            .filter(([key, value]) => value == true)
+            .map(([value]) => {
+              url += value + ", ";
+            });
+        }
+        const response = await fetch(url, {
+          headers: {
+            "X-Api-Key": API_KEY!,
+          },
+        });
 
         if (!response.ok) {
           throw new Error("Failed to fetch random word");
@@ -64,7 +99,7 @@ function WordsGame() {
 
   const generateOptions = (correctWord: string): string[] => {
     const options = new Set<string>([correctWord]);
-    while (options.size < 9) {
+    while (options.size < Math.min(amountOfWords, 4)) {
       const randomWord =
         wordsToDisplay[Math.floor(Math.random() * wordsToDisplay.length)];
       options.add(randomWord);
@@ -99,25 +134,159 @@ function WordsGame() {
     const value = e.target.value;
     if (!/^\d*$/.test(value)) return;
     const number = Number(value);
-    setAmountOfWords(Math.max(10, Math.min(90, number)));
+    if (!isCustom) {
+      setAmountOfWords(Math.max(10, Math.min(90, number)));
+    } else {
+      setAmountOfWords(Math.max(1, Math.min(500, number)));
+    }
   };
 
   return (
     <div className="bg-blue-50 h-screen sm:p-6 flex flex-col items-center">
       {gameStatus === 0 && !isLoadingWords && (
         <div className="bg-white p-6 shadow rounded-lg w-full max-w-md">
-          <label className="block text-gray-600 mb-2">Number of words:</label>
-          <select
-            onChange={handleAmountOfWords}
-            className="w-full border border-gray-300 rounded p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          <Tabs
+            defaultValue={`${isCustom ? "custom" : "leaderboard"}`}
+            className="w-full text-center"
           >
-            <option>10</option>
-            <option>30</option>
-            <option>50</option>
-            <option>70</option>
-            <option>90</option>
-          </select>
-
+            <TabsList>
+              <TabsTrigger
+                value="leaderboard"
+                onClick={() => setIsCustom(false)}
+              >
+                for Leaderboard
+              </TabsTrigger>
+              <TabsTrigger value="custom" onClick={() => setIsCustom(true)}>
+                Custom
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="leaderboard">
+              <div>
+                <label
+                  htmlFor="selectAmount"
+                  className="block text-gray-600 mb-2"
+                >
+                  Number of words:
+                </label>
+                <select
+                  id="selectAmount"
+                  onChange={handleAmountOfWords}
+                  className="w-full border border-gray-300 rounded p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                >
+                  <option>10</option>
+                  <option>30</option>
+                  <option>50</option>
+                  <option>70</option>
+                  <option>90</option>
+                </select>
+              </div>
+            </TabsContent>
+            <TabsContent value="custom">
+              <div className="mb-4">
+                <label
+                  className="block text-gray-600 mb-2 text-left"
+                  htmlFor="inputAmount"
+                >
+                  Number of words:{" "}
+                </label>
+                <input
+                  id="inputAmount"
+                  type="number"
+                  max="110"
+                  min="1"
+                  value={amountOfWords}
+                  ref={amountOfWordsRef}
+                  onChange={handleAmountOfWords}
+                  className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+              <h1 className="text-left">
+                Types of words:{" "}
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <RxQuestionMarkCircled />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <i className="text-xs text-gray-200">
+                        {" "}
+                        Not selecting either will be counted as selecting all
+                      </i>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </h1>
+              <div className="mb-4 flex gap-2 items-center">
+                <input
+                  type="checkbox"
+                  id="Nouns"
+                  name="typeOfWords"
+                  ref={typesNoun}
+                  onChange={() =>
+                    setTypes((prev) => ({ ...prev, noun: !prev.noun }))
+                  }
+                  checked={types.noun}
+                />
+                <label
+                  htmlFor="Nouns"
+                  className="block text-gray-600 text-left relative"
+                >
+                  Nouns
+                </label>{" "}
+                <input
+                  type="checkbox"
+                  id="Verbs"
+                  name="typeOfWords"
+                  ref={typesVerb}
+                  onChange={() =>
+                    setTypes((prev) => ({ ...prev, verb: !prev.verb }))
+                  }
+                  checked={types.verb}
+                />
+                <label
+                  htmlFor="Verbs"
+                  className="block text-gray-600 text-left relative"
+                >
+                  Verbs
+                </label>{" "}
+                <input
+                  type="checkbox"
+                  id="Adjectives"
+                  name="typeOfWords"
+                  ref={typesAdjective}
+                  onChange={() =>
+                    setTypes((prev) => ({
+                      ...prev,
+                      adjective: !prev.adjective,
+                    }))
+                  }
+                  checked={types.adjective}
+                />
+                <label
+                  htmlFor="Adjectives"
+                  className="block text-gray-600 text-left relative"
+                >
+                  Adjectives
+                </label>{" "}
+                <input
+                  type="checkbox"
+                  id="Adverbs"
+                  name="typeOfWords"
+                  ref={typesAdverb}
+                  onChange={() =>
+                    setTypes((prev) => ({ ...prev, adverb: !prev.adverb }))
+                  }
+                  checked={types.adverb}
+                />
+                <label
+                  htmlFor="Adverbs"
+                  className="block text-gray-600 text-left relative"
+                >
+                  Adverbs
+                </label>
+              </div>
+            </TabsContent>
+          </Tabs>
           <Button size="full" onClick={startGame}>
             Start Game
           </Button>
