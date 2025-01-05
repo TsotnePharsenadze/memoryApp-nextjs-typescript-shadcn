@@ -25,10 +25,10 @@ function WordsGame() {
     adjective: boolean;
     verb: boolean;
   }>({
-    noun: false,
-    adverb: false,
-    adjective: false,
-    verb: false,
+    noun: true,
+    adverb: true,
+    adjective: true,
+    verb: true,
   });
 
   const [gameStatus, setGameStatus] = useState<number>(0);
@@ -53,7 +53,11 @@ function WordsGame() {
     try {
       const wordPromises = Array.from({ length: amount }, async () => {
         let url = "https://api.api-ninjas.com/v1/randomword";
-        if (Object.values(types).includes(true)) {
+        if (
+          isCustom &&
+          Object.values(types).includes(true) &&
+          !Object.values(types).every((value) => value == true)
+        ) {
           url += "?type:";
           Object.entries(types)
             .filter(([key, value]) => value == true)

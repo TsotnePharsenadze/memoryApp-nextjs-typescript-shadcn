@@ -36,13 +36,13 @@ function ImagesGame() {
     abstract: boolean;
     wildlife: boolean;
   }>({
-    nature: false,
-    city: false,
-    technology: false,
-    food: false,
-    stillife: false,
-    abstract: false,
-    wildlife: false,
+    nature: true,
+    city: true,
+    technology: true,
+    food: true,
+    stillife: true,
+    abstract: true,
+    wildlife: true,
   });
 
   const handleAmountOfImagesRef = useRef(null);
@@ -68,7 +68,11 @@ function ImagesGame() {
   const fetchImages = async () => {
     const imagePromises = Array.from({ length: amountOfImages }, async () => {
       let url = "https://api.api-ninjas.com/v1/randomimage";
-      if (isCustom && Object.values(types).includes(true)) {
+      if (
+        isCustom &&
+        Object.values(types).includes(true) &&
+        !Object.values(types).every((value) => value == true)
+      ) {
         url += "?category:";
         Object.entries(types)
           .filter(([key, value]) => value == true)
@@ -320,7 +324,10 @@ function ImagesGame() {
                     name="typesOfImages"
                     ref={typesStillLife}
                     onChange={() =>
-                      setTypes((prev) => ({ ...prev, stillife: !prev.stillife }))
+                      setTypes((prev) => ({
+                        ...prev,
+                        stillife: !prev.stillife,
+                      }))
                     }
                     checked={types.stillife}
                   />
@@ -338,7 +345,10 @@ function ImagesGame() {
                     name="typesOfImages"
                     ref={typesAbstract}
                     onChange={() =>
-                      setTypes((prev) => ({ ...prev, abstract: !prev.abstract }))
+                      setTypes((prev) => ({
+                        ...prev,
+                        abstract: !prev.abstract,
+                      }))
                     }
                     checked={types.abstract}
                   />
@@ -356,7 +366,10 @@ function ImagesGame() {
                     name="typesOfImages"
                     ref={typesWildLife}
                     onChange={() =>
-                      setTypes((prev) => ({ ...prev, wildlife: !prev.wildlife }))
+                      setTypes((prev) => ({
+                        ...prev,
+                        wildlife: !prev.wildlife,
+                      }))
                     }
                     checked={types.wildlife}
                   />
