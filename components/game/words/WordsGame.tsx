@@ -11,7 +11,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { RxQuestionMarkCircled } from "react-icons/rx";
-import { trackSynchronousRequestDataAccessInDev } from "next/dist/server/app-render/dynamic-rendering";
 
 function WordsGame() {
   const [wordsToDisplay, setWordsToDisplay] = useState<string[]>([]);
@@ -36,7 +35,7 @@ function WordsGame() {
     correct: 0,
     incorrect: 0,
   });
-  
+
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
   const [wordsUserPicked, setWordsUserPicked] = useState<string[]>([]);
@@ -61,7 +60,7 @@ function WordsGame() {
         ) {
           url += "?type:";
           Object.entries(types)
-            .filter(([key, value]) => value == true)
+            .filter(([, value]) => value == true)
             .map(([value]) => {
               url += value + ", ";
             });
@@ -135,7 +134,7 @@ function WordsGame() {
     setEndTime(null);
   };
 
-  const handleAmountOfWords = (e: any) => {
+  const handleAmountOfWords = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const value = e.target.value;
     if (!/^\d*$/.test(value)) return;
     const number = Number(value);

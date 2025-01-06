@@ -30,7 +30,7 @@ const GameCard = ({
   bgColor: string;
   imageAlt: string;
 }) => {
-  let session = useSession();
+  const session = useSession();
   const router = useRouter();
 
   const goTo = (href: string) => {

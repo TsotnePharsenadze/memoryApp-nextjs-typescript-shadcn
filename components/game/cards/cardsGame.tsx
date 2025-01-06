@@ -99,7 +99,7 @@ function CardsGame() {
     setIsLoadingImages(true);
     try {
       const selectedImages = [];
-      imagePaths.sort((a, b) => Math.random() - 0.5);
+      imagePaths.sort(() => Math.random() - 0.5);
       if (isCustom) {
         if (isUnique) {
           if (amountOfImages > 52) {
@@ -108,12 +108,12 @@ function CardsGame() {
               if (tempImages > 52) {
                 for (let i = 0; i < 52; i++) {
                   selectedImages.push(`/cards/${imagePaths[i]}`);
-                  imagePaths.sort((a, b) => Math.random() - 0.5);
+                  imagePaths.sort(() => Math.random() - 0.5);
                 }
               } else {
                 for (let i = 0; i < tempImages; i++) {
                   selectedImages.push(`/cards/${imagePaths[i]}`);
-                  imagePaths.sort((a, b) => Math.random() - 0.5);
+                  imagePaths.sort(() => Math.random() - 0.5);
                 }
               }
               tempImages -= 52;
@@ -186,7 +186,9 @@ function CardsGame() {
     setEndTime(null);
   };
 
-  const handleAmountOfImages = (e: any) => {
+  const handleAmountOfImages = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const value = e.target.value;
     if (!/^\d*$/.test(value)) return;
     const number = Number(value);

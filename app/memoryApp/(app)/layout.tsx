@@ -13,7 +13,7 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
     if (session?.status == "unauthenticated") {
       router.push("/memoryApp/login");
     }
-  }, [session?.status]);
+  }, [session?.status, router]);
 
   if (session?.status == "loading") return <Spinner />;
 

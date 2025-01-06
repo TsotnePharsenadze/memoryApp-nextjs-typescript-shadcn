@@ -75,7 +75,7 @@ function ImagesGame() {
       ) {
         url += "?category:";
         Object.entries(types)
-          .filter(([key, value]) => value == true)
+          .filter(([, value]) => value == true)
           .map(([value]) => (url += value + ", "));
       }
       const response = await fetch(url, {
@@ -149,7 +149,9 @@ function ImagesGame() {
     setEndTime(null);
   };
 
-  const handleAmountOfImages = (e: any) => {
+  const handleAmountOfImages = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const value = e.target.value;
     if (!/^\d*$/.test(value)) return;
     const number = Number(value);

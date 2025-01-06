@@ -73,6 +73,7 @@ const Register = () => {
         router.push("/memoryApp/login");
       }
     } catch (err) {
+      console.log(err);
       setCustomError(true);
     } finally {
       setIsLoading(false);

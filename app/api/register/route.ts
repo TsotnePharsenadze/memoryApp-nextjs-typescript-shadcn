@@ -51,7 +51,7 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ newUser });
-  } catch (err: any) {
+  } catch (err) {
     if (err instanceof z.ZodError) {
       return NextResponse.json(
         {

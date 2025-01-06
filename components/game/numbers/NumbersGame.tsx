@@ -21,7 +21,7 @@ function NumbersGame() {
   };
 
   const generateInitialNumbers = (): string[] => {
-    let result: string[] = [];
+    const result: string[] = [];
     for (let i = 0; i < 10; i++) result.push(String(i));
     for (let i = 0; i < 10; i++) result.push("0" + i);
     for (let i = 10; i < 100; i++) result.push(String(i));
@@ -67,7 +67,7 @@ function NumbersGame() {
         });
         setNumbersToDisplay(array);
       } else {
-        let array: any[] | ((prevState: string[]) => string[]) = [];
+        let array: string[] | ((prevState: string[]) => string[]) = [];
         let remainingNumbers = amountOfNumbers;
 
         while (remainingNumbers > 0) {
@@ -158,7 +158,9 @@ function NumbersGame() {
     setEndTime(null);
   };
 
-  const handleAmountOfNumbers = (e: any) => {
+  const handleAmountOfNumbers = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const value = e.target.value;
     if (!/^\d*$/.test(value)) return;
     const number = Number(value);
