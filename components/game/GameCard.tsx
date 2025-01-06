@@ -34,11 +34,11 @@ const GameCard = ({
   const router = useRouter();
 
   const goTo = (href: string) => {
-    if (session?.status == "authenticated") {
-      router.push(`/memoryApp/${href.toLowerCase()}`);
-    } else if (session?.status == "unauthenticated") {
-      router.push(`/memoryApp/login`);
-    }
+    router.push(`/memoryApp/${href.toLowerCase()}`);
+    // if (session?.status == "authenticated") {
+    // } else if (session?.status == "unauthenticated") {
+    //   router.push(`/memoryApp/login`);
+    // }
   };
 
   return (
