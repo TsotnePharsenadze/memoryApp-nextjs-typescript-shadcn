@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 
-export async function POST(req: Request) {
+export async function POST(req: Request): Promise<Response> {
   try {
     const body = await req.json();
 
@@ -22,7 +22,7 @@ export async function POST(req: Request) {
     const currentUser = await auth();
 
     if (currentUser?.user?.id) {
-      return null;
+      return NextResponse.json(null, { status: 204 });
     }
 
     const findEmail = await prisma.user.findFirst({
