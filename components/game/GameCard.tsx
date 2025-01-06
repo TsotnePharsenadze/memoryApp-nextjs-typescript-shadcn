@@ -10,7 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-// import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 const GameCard = ({
@@ -30,15 +29,10 @@ const GameCard = ({
   bgColor: string;
   imageAlt: string;
 }) => {
-  // const session = useSession();
   const router = useRouter();
 
   const goTo = (href: string) => {
     router.push(`/memoryApp/${href.toLowerCase()}`);
-    // if (session?.status == "authenticated") {
-    // } else if (session?.status == "unauthenticated") {
-    //   router.push(`/memoryApp/login`);
-    // }
   };
 
   return (
