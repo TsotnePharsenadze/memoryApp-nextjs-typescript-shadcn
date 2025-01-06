@@ -53,6 +53,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   session: { strategy: "jwt" },
   pages: { signIn: "/memoryUp/login" },
+  secret: process.env.AUTH_SECRET,
   callbacks: {
     session: ({ session, token }) => ({
       ...session,
