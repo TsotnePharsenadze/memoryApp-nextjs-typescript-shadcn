@@ -36,6 +36,7 @@ function WordsGame() {
     correct: 0,
     incorrect: 0,
   });
+  
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
   const [wordsUserPicked, setWordsUserPicked] = useState<string[]>([]);
