@@ -64,7 +64,7 @@ function NumbersGame() {
     setNumbersToDisplay([]);
     if (isCustom) {
       if (isInRangeOf) {
-        let max =
+        const max =
           inRangeOf == 2
             ? 99
             : inRangeOf == 3
@@ -92,7 +92,7 @@ function NumbersGame() {
       }
     } else {
       for (let i = 0; i < amountOfNumbers; i++) {
-        let n = randomInRangeNumberGenerator(0, 99);
+        const n = randomInRangeNumberGenerator(0, 99);
         setNumbersToDisplay((prev) => [...prev, n]);
       }
     }
