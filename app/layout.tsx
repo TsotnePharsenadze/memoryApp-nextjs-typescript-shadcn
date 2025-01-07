@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import { SessionProvider } from "next-auth/react";
+import { Analytics } from "@vercel/analytics/react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -74,6 +75,7 @@ export default function RootLayout({
         <SessionProvider>
           <Header homeHref="/" />
           <div className="min-h-screen p-2 sm:p-6">{children}</div>
+          <Analytics />
         </SessionProvider>
       </body>
     </html>

@@ -3,40 +3,45 @@
 import { Button } from "@/components/ui/button";
 import { useRef, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { RxQuestionMarkCircled } from "react-icons/rx";
 
 function NumbersGame() {
-  const shuffleArray = (array: string[]): string[] => {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
+  const randomInRangeNumberGenerator = (min: number, max: number) => {
+    const randomNumber = new Set<string>();
+
+    while (max !== 0) {
+      const randomNum = Math.floor(Math.random() * (max - min + 1) + min)
+        .toString()
+        .padStart(String(max).length, "0");
+      randomNumber.add(randomNum);
+      max = Number(String(max).slice(0, String(max).length - 1));
     }
-    return array;
+
+    const shuffledNumbers = Array.from(randomNumber).sort(
+      () => Math.random() - 0.5
+    );
+    return shuffledNumbers[0];
   };
 
-  const generateInitialNumbers = (): string[] => {
-    const result: string[] = [];
-    for (let i = 0; i < 10; i++) result.push(String(i));
-    for (let i = 0; i < 10; i++) result.push("0" + i);
-    for (let i = 10; i < 100; i++) result.push(String(i));
-    return shuffleArray(result);
+  const randomInGroupNumberGenerator = (amount: number) => {
+    let number = "";
+    for (let i = 0; i < amount; i++) {
+      number += Math.floor(Math.random() * 10);
+    }
+    return number;
   };
 
-  const shuffledList = useRef<string[]>(generateInitialNumbers());
+  const [inGroupsOf, setInGroupsOf] = useState<number>(2);
+  const [inRangeOf, setInRangeOf] = useState<number>(2);
+  const inGroupsOfRef = useRef(null);
+  const inRangeOfRef = useRef(null);
+
+  const [isInRangeOf, setIsInRangeOf] = useState<boolean>(true);
 
   const [numbersToDisplay, setNumbersToDisplay] = useState<string[]>([]);
   const [amountOfNumbers, setAmountOfNumbers] = useState<number>(10);
   const amountOfNumbersRef = useRef(null);
 
   const [isCustom, setIsCustom] = useState<boolean>(false);
-  const [isUnique, setIsUnique] = useState<boolean>(false);
-  const isUniqueCheckBoxRef = useRef(null);
 
   const [currentIndex, setCurrentIndex] = useState<number>(0);
 
@@ -56,45 +61,40 @@ function NumbersGame() {
     e.preventDefault();
     setGameStatus(1);
     setStartTime(Date.now());
+    setNumbersToDisplay([]);
     if (isCustom) {
-      if (!isUnique) {
-        shuffledList.current = generateInitialNumbers();
-        const array = Array.from({ length: amountOfNumbers }, () => {
-          const randomIndex = Math.floor(
-            Math.random() * shuffledList.current.length
-          );
-          return shuffledList.current[randomIndex];
-        });
-        setNumbersToDisplay(array);
-      } else {
-        let array: string[] | ((prevState: string[]) => string[]) = [];
-        let remainingNumbers = amountOfNumbers;
-
-        while (remainingNumbers > 0) {
-          if (shuffledList.current.length === 0) {
-            shuffledList.current = generateInitialNumbers();
-          }
-
-          const batchSize = Math.min(
-            remainingNumbers,
-            110,
-            shuffledList.current.length
-          );
-          array = array.concat(shuffledList.current.slice(0, batchSize));
-          shuffledList.current.splice(0, batchSize);
-          remainingNumbers -= batchSize;
+      if (isInRangeOf) {
+        let max =
+          inRangeOf == 2
+            ? 99
+            : inRangeOf == 3
+            ? 999
+            : inRangeOf == 4
+            ? 9999
+            : inRangeOf == 5
+            ? 99999
+            : inRangeOf == 6
+            ? 999999
+            : 99;
+        for (let i = 0; i < amountOfNumbers; i++) {
+          setNumbersToDisplay((prev) => [
+            ...prev,
+            randomInRangeNumberGenerator(0, max),
+          ]);
         }
-
-        setNumbersToDisplay(array);
+      } else {
+        for (let i = 0; i < amountOfNumbers; i++) {
+          setNumbersToDisplay((prev) => [
+            ...prev,
+            randomInGroupNumberGenerator(inGroupsOf),
+          ]);
+        }
       }
     } else {
-      if (shuffledList.current.length < amountOfNumbers) {
-        shuffledList.current = generateInitialNumbers();
+      for (let i = 0; i < amountOfNumbers; i++) {
+        let n = randomInRangeNumberGenerator(0, 99);
+        setNumbersToDisplay((prev) => [...prev, n]);
       }
-
-      const array = shuffledList.current.slice(0, amountOfNumbers);
-      setNumbersToDisplay(array);
-      shuffledList.current.splice(0, amountOfNumbers);
     }
   };
 
@@ -108,9 +108,7 @@ function NumbersGame() {
     const options = new Set<string>([correctNumber]);
     while (options.size < Math.min(amountOfNumbers, 9)) {
       const randomNumber =
-        shuffledList.current[
-          Math.floor(Math.random() * shuffledList.current.length)
-        ];
+        numbersToDisplay[Math.floor(Math.random() * numbersToDisplay.length)];
       options.add(randomNumber);
     }
     return Array.from(options).sort(() => Math.random() - 0.5);
@@ -156,6 +154,24 @@ function NumbersGame() {
     setCurrentIndex(0);
     setStartTime(null);
     setEndTime(null);
+  };
+
+  const handleGroupChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    if (!/^\d*$/.test(value)) return;
+    const number = Number(value);
+    if ([2, 3, 4, 5, 6].includes(number)) {
+      setInGroupsOf(number);
+    }
+  };
+
+  const handleInRangeOf = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    if (!/^\d*$/.test(value)) return;
+    const number = Number(value);
+    if ([2, 3, 4, 5, 6].includes(number)) {
+      setInRangeOf(number);
+    }
   };
 
   const handleAmountOfNumbers = (
@@ -244,35 +260,80 @@ function NumbersGame() {
                   className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
               </div>
-              <div className="mb-4 flex gap-2 items-center">
-                <input
-                  type="checkbox"
-                  id="unique"
-                  ref={isUniqueCheckBoxRef}
-                  onChange={() => setIsUnique((prev) => !prev)}
-                  checked={isUnique}
-                />
-                <label
-                  htmlFor="unique"
-                  className="block text-gray-600 text-left relative"
-                >
-                  Unique{" "}
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <RxQuestionMarkCircled />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <i className="text-xs text-gray-200">
-                          {" "}
-                          if number of items is over 110 -- [00-09, 0-9, 10-99]
-                          -- will be repeated at random
-                        </i>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </label>
-              </div>
+              <Tabs
+                defaultValue={`${isInRangeOf ? "range" : "groups"}`}
+                className="border-black-100 shadow-sm border-2 mb-2 rounded-md p-2"
+              >
+                <TabsList>
+                  <TabsTrigger
+                    onClick={() => setIsInRangeOf(false)}
+                    value="groups"
+                  >
+                    In groups
+                  </TabsTrigger>
+                  <span className="text-black pl-2 pr-2 text-xs font-black border-l-[1px] border-black border-r-[1px] m-2">
+                    OR
+                  </span>
+                  <TabsTrigger
+                    onClick={() => setIsInRangeOf(true)}
+                    value="range"
+                  >
+                    In range
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="groups">
+                  <div>
+                    <label
+                      className="block text-gray-600 mb-2 text-left"
+                      htmlFor="inGroupsOf"
+                    >
+                      In groups of:
+                    </label>
+                    <select
+                      id="inGroupsOF"
+                      onChange={handleGroupChange}
+                      className="w-full border border-gray-300 rounded p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      ref={inGroupsOfRef}
+                      value={inGroupsOf}
+                    >
+                      <option>2</option>
+                      <option>3</option>
+                      <option>4</option>
+                      <option>5</option>
+                      <option>6</option>
+                    </select>
+                  </div>
+                </TabsContent>
+                <TabsContent value="range">
+                  <div>
+                    <label
+                      className="block text-gray-600 mb-2 text-left"
+                      htmlFor="inRangeOf"
+                    >
+                      In range:
+                    </label>
+                    <select
+                      id="inRangeOf"
+                      onChange={handleInRangeOf}
+                      value={inRangeOf}
+                      ref={inRangeOfRef}
+                      className="w-full border border-gray-300 rounded p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    >
+                      <option value="2">00-99</option>
+                      <option value="3">000-999 (includes 00-99)</option>
+                      <option value="4">
+                        0000-9999 (includes 00-99, 000-999)
+                      </option>
+                      <option value="5">
+                        00000-99999 (includes all above)
+                      </option>
+                      <option value="6">
+                        000000-999999 (includes all above)
+                      </option>
+                    </select>
+                  </div>
+                </TabsContent>
+              </Tabs>
             </TabsContent>
           </Tabs>
           <Button size="full" onClick={startGame}>
