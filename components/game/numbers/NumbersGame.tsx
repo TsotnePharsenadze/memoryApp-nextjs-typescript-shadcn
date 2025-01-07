@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useRef, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FaSpinner } from "react-icons/fa";
 
 function NumbersGame() {
   const randomInRangeNumberGenerator = (min: number, max: number) => {
@@ -32,6 +33,7 @@ function NumbersGame() {
 
   const [inGroupsOf, setInGroupsOf] = useState<number>(2);
   const [inRangeOf, setInRangeOf] = useState<number>(2);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const inGroupsOfRef = useRef(null);
   const inRangeOfRef = useRef(null);
 
@@ -146,7 +148,22 @@ function NumbersGame() {
     }
   };
 
-  const resetGame = (): void => {
+  const resetGame = async (): Promise<void> => {
+    setIsLoading(true);
+    await fetch("/api/game/number/", {
+      method: "POST",
+      body: JSON.stringify({
+        numbersUserPicked,
+        gameStatus,
+        correctAnswers: score.correct,
+        incorrectAnswers: score.incorrect,
+        numbersToDisplay,
+        currentIndex,
+        endTime,
+        startTime,
+      }),
+    });
+    setIsLoading(false);
     setNumbersUserPicked([]);
     setGameStatus(0);
     setScore({ correct: 0, incorrect: 0 });
@@ -436,7 +453,7 @@ function NumbersGame() {
             </div>
           </div>
           <Button size="full" onClick={resetGame}>
-            Restart
+            {isLoading ? <FaSpinner className="animate-spin" /> : "Restart"}
           </Button>
         </div>
       )}
