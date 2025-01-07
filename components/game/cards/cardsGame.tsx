@@ -127,8 +127,21 @@ function CardsGame() {
   const loadImages = () => {
     setIsLoadingImages(true);
     try {
+      let currentTypes = { ...types };
+
+      // Ensure all values are true if all were false
+      if (Object.values(currentTypes).every((val) => !val)) {
+        currentTypes = {
+          clubs: true,
+          diamonds: true,
+          hearts: true,
+          spades: true,
+        };
+        setTypes(currentTypes);
+      }
+
       const selectedImages: string[] = [];
-      const activeTypes = Object.entries(types)
+      const activeTypes = Object.entries(currentTypes)
         .filter(([, isEnabled]) => isEnabled)
         .map(([type]) => type.charAt(0).toUpperCase());
 
@@ -199,11 +212,19 @@ function CardsGame() {
 
   const generateOptions = (correctImage: string): string[] => {
     const options = new Set<string>([correctImage]);
-    while (options.size < Math.min(amountOfImages, 9)) {
+    const fallbackImages = imagePaths.map((path) => `/cards/${path}`);
+
+    while (options.size < Math.min(imagesToDisplay.length, 9)) {
       const randomImage =
-        imagesToDisplay[Math.floor(Math.random() * imagesToDisplay.length)];
-      options.add(randomImage);
+        imagesToDisplay.length > 1
+          ? imagesToDisplay[Math.floor(Math.random() * imagesToDisplay.length)]
+          : fallbackImages[Math.floor(Math.random() * fallbackImages.length)];
+
+      if (!options.has(randomImage)) {
+        options.add(randomImage);
+      }
     }
+
     return Array.from(options).sort(() => Math.random() - 0.5);
   };
 
