@@ -16,7 +16,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import Image from "next/image";
 import { useRef, useState } from "react";
 import { RxQuestionMarkCircled } from "react-icons/rx";
 
@@ -84,51 +83,96 @@ function CardsGame() {
   const [isUnique, setIsUnique] = useState<boolean>(false);
   const [slideIndex, setSlideIndex] = useState<number>(1);
   const [gameStatus, setGameStatus] = useState<number>(0);
+
   const [score, setScore] = useState<{ correct: number; incorrect: number }>({
     correct: 0,
     incorrect: 0,
   });
+
+  const [types, setTypes] = useState<{
+    clubs: boolean;
+    diamonds: boolean;
+    hearts: boolean;
+    spades: boolean;
+  }>({
+    clubs: true,
+    diamonds: true,
+    hearts: true,
+    spades: true,
+  });
+
+  const typesClubs = useRef(null);
+  const typesDiamonds = useRef(null);
+  const typesHearts = useRef(null);
+  const typesSpades = useRef(null);
+
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
   const [imagesUserPicked, setImagesUserPicked] = useState<string[]>([]);
 
+  const [inGroupsOf, setInGroupsOf] = useState<number>(1);
+  const inGroupsOfRef = useRef(null);
+
   const amountOfImagesRef = useRef(null);
   const isUniqueCheckBoxRef = useRef(null);
+
+  const groupImages = () => {
+    const groupedImages = [];
+    for (let i = 0; i < amountOfImages; i += inGroupsOf) {
+      groupedImages.push(imagesToDisplay.slice(i, i + inGroupsOf));
+    }
+    return groupedImages;
+  };
 
   const loadImages = () => {
     setIsLoadingImages(true);
     try {
-      const selectedImages = [];
-      imagePaths.sort(() => Math.random() - 0.5);
+      const selectedImages: string[] = [];
+      const activeTypes = Object.entries(types)
+        .filter(([_, isEnabled]) => isEnabled)
+        .map(([type]) => type.charAt(0).toUpperCase());
+
+      const filteredImagePaths = imagePaths.filter((path) =>
+        activeTypes.some((type) => path.includes(type))
+      );
+
+      filteredImagePaths.sort(() => Math.random() - 0.5);
+
       if (isCustom) {
         if (isUnique) {
-          if (amountOfImages > 52) {
+          if (amountOfImages > filteredImagePaths.length) {
             let tempImages = amountOfImages;
             while (tempImages > 0) {
-              if (tempImages > 52) {
-                for (let i = 0; i < 52; i++) {
-                  selectedImages.push(`/cards/${imagePaths[i]}`);
-                  imagePaths.sort(() => Math.random() - 0.5);
+              if (tempImages > filteredImagePaths.length) {
+                for (let i = 0; i < filteredImagePaths.length; i++) {
+                  selectedImages.push(`/cards/${filteredImagePaths[i]}`);
+                  filteredImagePaths.sort(() => Math.random() - 0.5);
                 }
               } else {
                 for (let i = 0; i < tempImages; i++) {
-                  selectedImages.push(`/cards/${imagePaths[i]}`);
-                  imagePaths.sort(() => Math.random() - 0.5);
+                  selectedImages.push(`/cards/${filteredImagePaths[i]}`);
+                  filteredImagePaths.sort(() => Math.random() - 0.5);
                 }
               }
-              tempImages -= 52;
+              tempImages -= filteredImagePaths.length;
+            }
+          } else {
+            for (let i = 0; i < amountOfImages; i++) {
+              selectedImages.push(`/cards/${filteredImagePaths[i]}`);
             }
           }
         } else {
           for (let i = 0; i < amountOfImages; i++) {
             const randomImage =
-              imagePaths[Math.floor(Math.random() * imagePaths.length)];
+              filteredImagePaths[
+                Math.floor(Math.random() * filteredImagePaths.length)
+              ];
             selectedImages.push(`/cards/${randomImage}`);
           }
         }
       } else {
         for (let i = 0; i < amountOfImages; i++) {
-          selectedImages.push(`/cards/${imagePaths[i]}`);
+          selectedImages.push(`/cards/${filteredImagePaths[i]}`);
         }
       }
 
@@ -217,6 +261,15 @@ function CardsGame() {
     }
   };
 
+  function handleGroupChange(e: React.ChangeEvent<HTMLSelectElement>): void {
+    const value = e.target.value;
+    if (!/^\d*$/.test(value)) return;
+    const number = Number(value);
+    if ([1, 2].includes(number)) {
+      setInGroupsOf(number);
+    }
+  }
+
   return (
     <div className="bg-blue-50 h-screen sm:p-6 flex flex-col items-center">
       {gameStatus === 0 && !isLoadingImages && (
@@ -254,6 +307,24 @@ function CardsGame() {
                   <option>52</option>
                 </select>
               </div>
+              <div>
+                <label
+                  className="block text-gray-600 mb-2 text-left"
+                  htmlFor="inGroupsOf"
+                >
+                  In groups of:
+                </label>
+                <select
+                  id="inGroupsOF"
+                  onChange={handleGroupChange}
+                  className="w-full border border-gray-300 rounded p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  ref={inGroupsOfRef}
+                  value={inGroupsOf}
+                >
+                  <option>1</option>
+                  <option>2</option>
+                </select>
+              </div>
             </TabsContent>
             <TabsContent value="custom">
               <div className="mb-4">
@@ -273,6 +344,106 @@ function CardsGame() {
                   onChange={handleAmountOfImages}
                   className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
+              </div>
+              <div>
+                <label
+                  className="block text-gray-600 mb-2 text-left"
+                  htmlFor="inGroupsOf"
+                >
+                  In groups of:
+                </label>
+                <select
+                  id="inGroupsOF"
+                  onChange={handleGroupChange}
+                  className="w-full border border-gray-300 rounded p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  ref={inGroupsOfRef}
+                  value={inGroupsOf}
+                >
+                  <option>1</option>
+                  <option>2</option>
+                </select>
+              </div>
+
+              <div className="mb-4 flex gap-2 items-center">
+                <input
+                  type="checkbox"
+                  id="Clubs"
+                  name="typesOfCards"
+                  ref={typesClubs}
+                  onChange={() =>
+                    setTypes((prev) => ({ ...prev, clubs: !prev.clubs }))
+                  }
+                  checked={types.clubs}
+                />
+                <label
+                  htmlFor="Clubs"
+                  className="block text-gray-600 text-left relative"
+                >
+                  <img
+                    src="/cards/AC.svg"
+                    className="border-black border-[1px]"
+                  />
+                </label>{" "}
+                <input
+                  type="checkbox"
+                  id="Diamons"
+                  name="typesOfCards"
+                  ref={typesDiamonds}
+                  onChange={() =>
+                    setTypes((prev) => ({ ...prev, diamonds: !prev.diamonds }))
+                  }
+                  checked={types.diamonds}
+                />
+                <label
+                  htmlFor="Diamons"
+                  className="block text-gray-600 text-left relative"
+                >
+                  <img
+                    src="/cards/AD.svg"
+                    className="border-black border-[1px]"
+                  />
+                </label>{" "}
+                <input
+                  type="checkbox"
+                  id="Spades"
+                  name="typesOfCards"
+                  ref={typesSpades}
+                  onChange={() =>
+                    setTypes((prev) => ({
+                      ...prev,
+                      spades: !prev.spades,
+                    }))
+                  }
+                  checked={types.spades}
+                />
+                <label
+                  htmlFor="Spades"
+                  className="block text-gray-600 text-left relative"
+                >
+                  <img
+                    src="/cards/AS.svg"
+                    className="border-black border-[1px]"
+                  />
+                </label>{" "}
+                <input
+                  type="checkbox"
+                  id="Hearts"
+                  name="typesOfCards"
+                  ref={typesHearts}
+                  onChange={() =>
+                    setTypes((prev) => ({ ...prev, hearts: !prev.hearts }))
+                  }
+                  checked={types.hearts}
+                />
+                <label
+                  htmlFor="Hearts"
+                  className="block text-gray-600 text-left relative"
+                >
+                  <img
+                    src="/cards/AH.svg"
+                    className="border-black border-[1px]"
+                  />
+                </label>
               </div>
               <div className="mb-4 flex gap-2 items-center">
                 <input
@@ -318,16 +489,18 @@ function CardsGame() {
           <div className="grid grid-cols-1 gap-4 justify-items-center mb-4">
             <Carousel className="max-w-xs ">
               <CarouselContent>
-                {imagesToDisplay.map((image, index) => (
+                {groupImages().map((imageGroup, index) => (
                   <CarouselItem key={index}>
-                    <Image
-                      key={index}
-                      src={image}
-                      width={230}
-                      height={230}
-                      alt="Memorize this"
-                      className=" rounded mx-auto"
-                    />
+                    <div className="flex flex-wrap justify-center">
+                      {imageGroup.map((image, i) => (
+                        <img
+                          key={`${index}-${i}`}
+                          src={image}
+                          alt="Memorize this"
+                          className="h-[300px] w-[300px] rounded mx-auto mt-2"
+                        />
+                      ))}
+                    </div>
                   </CarouselItem>
                 ))}
               </CarouselContent>

@@ -17,6 +17,10 @@ function WordsGame() {
   const [amountOfWords, setAmountOfWords] = useState<number>(10);
   const [isLoadingWords, setIsLoadingWords] = useState<boolean>(false);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [inGroupsOf, setInGroupsOf] = useState<number>(1);
+
+  const inGroupsOfRef = useRef(null);
+
   const [isCustom, setIsCustom] = useState<boolean>(false);
   const [types, setTypes] = useState<{
     noun: boolean;
@@ -47,6 +51,14 @@ function WordsGame() {
   const typesVerb = useRef(null);
 
   const API_KEY = process.env.NEXT_PUBLIC_API_NINJA_KEY;
+
+  const groupWords = () => {
+    const groupedWords = [];
+    for (let i = 0; i < amountOfWords; i += inGroupsOf) {
+      groupedWords.push(wordsToDisplay.slice(i, i + inGroupsOf).join(" & \n "));
+    }
+    return groupedWords;
+  };
 
   const fetchRandomWords = async (amount: number) => {
     setIsLoadingWords(true);
@@ -134,7 +146,9 @@ function WordsGame() {
     setEndTime(null);
   };
 
-  const handleAmountOfWords = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleAmountOfWords = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const value = e.target.value;
     if (!/^\d*$/.test(value)) return;
     const number = Number(value);
@@ -142,6 +156,15 @@ function WordsGame() {
       setAmountOfWords(Math.max(10, Math.min(90, number)));
     } else {
       setAmountOfWords(Math.max(1, Math.min(500, number)));
+    }
+  };
+
+  const handleGroupChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    if (!/^\d*$/.test(value)) return;
+    const number = Number(value);
+    if ([1, 2, 3, 4, 5, 6].includes(number)) {
+      setInGroupsOf(number);
     }
   };
 
@@ -168,7 +191,7 @@ function WordsGame() {
               <div>
                 <label
                   htmlFor="selectAmount"
-                  className="block text-gray-600 mb-2"
+                  className="block text-gray-600 mb-2 text-left"
                 >
                   Number of words:
                 </label>
@@ -182,6 +205,28 @@ function WordsGame() {
                   <option>50</option>
                   <option>70</option>
                   <option>90</option>
+                </select>
+              </div>
+              <div>
+                <label
+                  className="block text-gray-600 mb-2 text-left"
+                  htmlFor="inGroupsOf"
+                >
+                  In groups of:
+                </label>
+                <select
+                  id="inGroupsOF"
+                  onChange={handleGroupChange}
+                  className="w-full border border-gray-300 rounded p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  ref={inGroupsOfRef}
+                  value={inGroupsOf}
+                >
+                  <option>1</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>5</option>
+                  <option>6</option>
                 </select>
               </div>
             </TabsContent>
@@ -204,6 +249,28 @@ function WordsGame() {
                   className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
               </div>
+              <div>
+                <label
+                  className="block text-gray-600 mb-2 text-left"
+                  htmlFor="inGroupsOf"
+                >
+                  In groups of:
+                </label>
+                <select
+                  id="inGroupsOF"
+                  onChange={handleGroupChange}
+                  className="w-full border border-gray-300 rounded p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  ref={inGroupsOfRef}
+                  value={inGroupsOf}
+                >
+                  <option>1</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>5</option>
+                  <option>6</option>
+                </select>
+              </div>
               <h1 className="text-left">
                 Types of words:{" "}
                 <TooltipProvider>
@@ -220,6 +287,7 @@ function WordsGame() {
                   </Tooltip>
                 </TooltipProvider>
               </h1>
+
               <div className="mb-4 flex gap-2 items-center">
                 <input
                   type="checkbox"
@@ -306,10 +374,10 @@ function WordsGame() {
               Memorize these words:
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {wordsToDisplay.map((word, index) => (
+              {groupWords().map((word, index) => (
                 <div
                   key={index}
-                  className="text-xl font-semibold p-4 rounded bg-blue-200 text-center break-words"
+                  className="text-xl font-semibold p-2 rounded bg-blue-200 text-center break-words"
                 >
                   {word}
                 </div>

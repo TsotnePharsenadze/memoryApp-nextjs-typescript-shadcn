@@ -26,6 +26,8 @@ function ImagesGame() {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [slideIndex, setSlideIndex] = useState<number>(1);
   const [isCustom, setIsCustom] = useState<boolean>(false);
+  const [inGroupsOf, setInGroupsOf] = useState<number>(1);
+  const inGroupsOfRef = useRef(null);
 
   const [types, setTypes] = useState<{
     nature: boolean;
@@ -64,6 +66,14 @@ function ImagesGame() {
   const [endTime, setEndTime] = useState<number | null>(null);
   const [imagesUserPicked, setImagesUserPicked] = useState<string[]>([]);
   const API_KEY = process.env.NEXT_PUBLIC_API_NINJA_KEY;
+
+  const groupImages = () => {
+    const groupedImages = [];
+    for (let i = 0; i < amountOfImages; i += inGroupsOf) {
+      groupedImages.push(imagesToDisplay.slice(i, i + inGroupsOf));
+    }
+    return groupedImages;
+  };
 
   const fetchImages = async () => {
     const imagePromises = Array.from({ length: amountOfImages }, async () => {
@@ -168,6 +178,15 @@ function ImagesGame() {
     }
   };
 
+  function handleGroupChange(e: React.ChangeEvent<HTMLSelectElement>): void {
+    const value = e.target.value;
+    if (!/^\d*$/.test(value)) return;
+    const number = Number(value);
+    if ([1, 2].includes(number)) {
+      setInGroupsOf(number);
+    }
+  }
+
   return (
     <div className="bg-blue-50 h-screen sm:p-6 flex flex-col items-center">
       {gameStatus === 0 && !isLoadingImages && (
@@ -191,7 +210,7 @@ function ImagesGame() {
               <div>
                 <label
                   htmlFor="selectAmount"
-                  className="block text-gray-600 mb-2"
+                  className="block text-gray-600 mb-2 text-left"
                 >
                   Number of images:
                 </label>
@@ -205,6 +224,24 @@ function ImagesGame() {
                   <option>50</option>
                   <option>70</option>
                   <option>90</option>
+                </select>
+              </div>
+              <div>
+                <label
+                  className="block text-gray-600 mb-2 text-left"
+                  htmlFor="inGroupsOf"
+                >
+                  In groups of:
+                </label>
+                <select
+                  id="inGroupsOF"
+                  onChange={handleGroupChange}
+                  className="w-full border border-gray-300 rounded p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  ref={inGroupsOfRef}
+                  value={inGroupsOf}
+                >
+                  <option>1</option>
+                  <option>2</option>
                 </select>
               </div>
             </TabsContent>
@@ -226,6 +263,24 @@ function ImagesGame() {
                   onChange={handleAmountOfImages}
                   className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
+              </div>
+              <div>
+                <label
+                  className="block text-gray-600 mb-2 text-left"
+                  htmlFor="inGroupsOf"
+                >
+                  In groups of:
+                </label>
+                <select
+                  id="inGroupsOF"
+                  onChange={handleGroupChange}
+                  className="w-full border border-gray-300 rounded p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  ref={inGroupsOfRef}
+                  value={inGroupsOf}
+                >
+                  <option>1</option>
+                  <option>2</option>
+                </select>
               </div>
               <h1 className="text-left">
                 Types of images:{" "}
@@ -398,14 +453,18 @@ function ImagesGame() {
           <div className="grid grid-cols-1 gap-4 justify-items-center mb-4">
             <Carousel className="max-w-xs ">
               <CarouselContent>
-                {imagesToDisplay.map((image, index) => (
+                {groupImages().map((imageGroup, index) => (
                   <CarouselItem key={index}>
-                    <img
-                      key={index}
-                      src={image}
-                      alt="Memorize this"
-                      className="h-[300px] w-[300px] rounded mx-auto"
-                    />
+                    <div className="flex flex-wrap justify-center">
+                      {imageGroup.map((image, i) => (
+                        <img
+                          key={`${index}-${i}`}
+                          src={image}
+                          alt="Memorize this"
+                          className="h-[300px] w-[300px] rounded mx-auto mt-2"
+                        />
+                      ))}
+                    </div>
                   </CarouselItem>
                 ))}
               </CarouselContent>
