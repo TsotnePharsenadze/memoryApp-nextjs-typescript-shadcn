@@ -129,7 +129,7 @@ function CardsGame() {
     try {
       const selectedImages: string[] = [];
       const activeTypes = Object.entries(types)
-        .filter(([_, isEnabled]) => isEnabled)
+        .filter(([, isEnabled]) => isEnabled)
         .map(([type]) => type.charAt(0).toUpperCase());
 
       const filteredImagePaths = imagePaths.filter((path) =>
