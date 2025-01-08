@@ -11,19 +11,37 @@ export async function GET() {
     );
   }
 
-  const groupDataByDate = async (model: any) =>
-    await model.findMany({
-      where: { userId: currentUser?.user?.id },
-      select: {
-        createdAt: true,
-        correctAnswers: true,
-      },
-    });
+  const numbers = await prisma.gameStatsNumber.findMany({
+    where: { userId: currentUser?.user?.id },
+    select: {
+      createdAt: true,
+      correctAnswers: true,
+    },
+  });
 
-  const numbers = await groupDataByDate(prisma.gameStatsNumber);
-  const words = await groupDataByDate(prisma.gameStatsWord);
-  const images = await groupDataByDate(prisma.gameStatsImage);
-  const cards = await groupDataByDate(prisma.gameStatsCard);
+  const words = await prisma.gameStatsWord.findMany({
+    where: { userId: currentUser?.user?.id },
+    select: {
+      createdAt: true,
+      correctAnswers: true,
+    },
+  });
+
+  const images = await prisma.gameStatsImage.findMany({
+    where: { userId: currentUser?.user?.id },
+    select: {
+      createdAt: true,
+      correctAnswers: true,
+    },
+  });
+
+  const cards = await prisma.gameStatsCard.findMany({
+    where: { userId: currentUser?.user?.id },
+    select: {
+      createdAt: true,
+      correctAnswers: true,
+    },
+  });
 
   return new Response(
     JSON.stringify({
