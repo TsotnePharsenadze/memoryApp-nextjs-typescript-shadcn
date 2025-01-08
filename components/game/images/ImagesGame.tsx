@@ -578,7 +578,7 @@ function ImagesGame() {
             </div>
           </div>
           <Button size="full" onClick={resetGame}>
-            {isLoading ? <FaSpinner className="animate-spin" /> : "Restart"}
+            {isLoading ? <FaSpinner className="animate-spin" /> : "Save and Restart"}
           </Button>
         </div>
       )}
