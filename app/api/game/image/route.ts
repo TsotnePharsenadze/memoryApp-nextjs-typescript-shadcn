@@ -51,6 +51,7 @@ export async function POST(req: Request) {
       gameStats,
     });
   } catch (error) {
+    console.log(JSON.stringify(error));
     return NextResponse.json(
       { message: "Failed to save game stats" },
       { status: 500 }
