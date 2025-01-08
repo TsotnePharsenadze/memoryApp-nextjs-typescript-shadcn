@@ -11,11 +11,13 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { RxQuestionMarkCircled } from "react-icons/rx";
+import { FaSpinner } from "react-icons/fa";
 
 function WordsGame() {
   const [wordsToDisplay, setWordsToDisplay] = useState<string[]>([]);
   const [amountOfWords, setAmountOfWords] = useState<number>(10);
   const [isLoadingWords, setIsLoadingWords] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [inGroupsOf, setInGroupsOf] = useState<number>(1);
 
@@ -136,7 +138,23 @@ function WordsGame() {
     }
   };
 
-  const resetGame = (): void => {
+  const resetGame = async (): Promise<void> => {
+    setIsLoading(true);
+    await fetch("/api/game/word/", {
+      method: "POST",
+      body: JSON.stringify({
+        wordsUserPicked,
+        gameStatus,
+        correctAnswers: score.correct,
+        incorrectAnswers: score.incorrect,
+        wordsToDisplay,
+        currentIndex,
+        endTime,
+        startTime,
+        isCustom,
+      }),
+    });
+    setIsLoading(false);
     setWordsUserPicked([]);
     setGameStatus(0);
     setScore({ correct: 0, incorrect: 0 });
@@ -460,7 +478,7 @@ function WordsGame() {
             </div>
           </div>
           <Button size="full" onClick={resetGame}>
-            Restart
+            {isLoading ? <FaSpinner className="animate-spin" /> : "Restart"}
           </Button>
         </div>
       )}

@@ -140,7 +140,7 @@ const Register = () => {
                   <FormMessage />
                 ) : (
                   <FormDescription>
-                    Your email to receive verification code
+                    Email verification is <b>NOT</b> activated yet
                   </FormDescription>
                 )}
               </FormItem>

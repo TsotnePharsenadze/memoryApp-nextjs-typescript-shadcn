@@ -161,6 +161,7 @@ function NumbersGame() {
         currentIndex,
         endTime,
         startTime,
+        isCustom,
       }),
     });
     setIsLoading(false);

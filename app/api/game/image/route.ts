@@ -19,27 +19,27 @@ export async function POST(req: Request) {
     correctAnswers,
     incorrectAnswers,
     gameStatus,
-    isCustom,
-    numbersUserPicked,
-    numbersToDisplay,
+    imagesUserPicked,
+    imagesToDisplay,
     currentIndex,
+    isCustom,
     startTime,
     endTime,
   } = await req.json();
 
   try {
-    const parsedNumbersUserPicked = numbersUserPicked.map(Number);
-    const parsedNumbersToDisplay = numbersToDisplay.map(Number);
+    const parsedImagesUserPicked = imagesUserPicked.map(String);
+    const parsedImagesToDisplay = imagesToDisplay.map(String);
 
-    const gameStats = await prisma.gameStatsNumber.create({
+    const gameStats = await prisma.gameStatsImage.create({
       data: {
         userId: currentUser.user.id,
         correctAnswers,
         incorrectAnswers,
         gameStatus,
         isCustom,
-        numbersUserPicked: parsedNumbersUserPicked,
-        numbersToDisplay: parsedNumbersToDisplay,
+        imagesUserPicked: parsedImagesUserPicked,
+        imagesToDisplay: parsedImagesToDisplay,
         currentIndex,
         startTime: new Date(startTime),
         endTime: new Date(endTime),

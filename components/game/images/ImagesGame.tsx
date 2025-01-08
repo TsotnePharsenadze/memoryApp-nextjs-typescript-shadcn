@@ -17,6 +17,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useRef, useState } from "react";
+import { FaSpinner } from "react-icons/fa";
 import { RxQuestionMarkCircled } from "react-icons/rx";
 
 function ImagesGame() {
@@ -24,6 +25,8 @@ function ImagesGame() {
   const [amountOfImages, setAmountOfImages] = useState<number>(10);
   const [isLoadingImages, setIsLoadingImages] = useState<boolean>(false);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const [slideIndex, setSlideIndex] = useState<number>(1);
   const [isCustom, setIsCustom] = useState<boolean>(false);
   const [inGroupsOf, setInGroupsOf] = useState<number>(1);
@@ -149,7 +152,23 @@ function ImagesGame() {
     }
   };
 
-  const resetGame = (): void => {
+  const resetGame = async (): Promise<void> => {
+    setIsLoading(true);
+    await fetch("/api/game/image/", {
+      method: "POST",
+      body: JSON.stringify({
+        imagesUserPicked,
+        gameStatus,
+        correctAnswers: score.correct,
+        incorrectAnswers: score.incorrect,
+        imagesToDisplay,
+        currentIndex,
+        endTime,
+        startTime,
+        isCustom,
+      }),
+    });
+    setIsLoading(false);
     setImagesUserPicked([]);
     setGameStatus(0);
     setScore({ correct: 0, incorrect: 0 });
@@ -559,7 +578,7 @@ function ImagesGame() {
             </div>
           </div>
           <Button size="full" onClick={resetGame}>
-            Restart
+            {isLoading ? <FaSpinner className="animate-spin" /> : "Restart"}
           </Button>
         </div>
       )}

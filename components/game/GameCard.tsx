@@ -21,6 +21,7 @@ const GameCard = ({
   imageSrc,
   bgColor,
   imageAlt,
+  setIsLoading,
 }: {
   title: string;
   description: string;
@@ -29,11 +30,13 @@ const GameCard = ({
   imageSrc: string;
   bgColor: string;
   imageAlt: string;
+  setIsLoading: (state: boolean) => void;
 }) => {
   const session = useSession();
   const router = useRouter();
 
   const goTo = (href: string) => {
+    setIsLoading(true);
     if (session?.status == "authenticated") {
       router.push(`/memoryApp/${href.toLowerCase()}`);
     } else if (session?.status == "unauthenticated") {
