@@ -17,6 +17,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useRef, useState } from "react";
+import { FaSpinner } from "react-icons/fa";
 import { RxQuestionMarkCircled } from "react-icons/rx";
 
 const imagePaths = [
@@ -81,6 +82,7 @@ function CardsGame() {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [isCustom, setIsCustom] = useState<boolean>(false);
   const [isUnique, setIsUnique] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [slideIndex, setSlideIndex] = useState<number>(1);
   const [gameStatus, setGameStatus] = useState<number>(0);
 
@@ -129,7 +131,6 @@ function CardsGame() {
     try {
       let currentTypes = { ...types };
 
-      // Ensure all values are true if all were false
       if (Object.values(currentTypes).every((val) => !val)) {
         currentTypes = {
           clubs: true,
@@ -241,7 +242,24 @@ function CardsGame() {
     }
   };
 
-  const resetGame = (): void => {
+  const resetGame = async (): Promise<void> => {
+    setIsLoading(true);
+    await fetch("/api/game/card/", {
+      method: "POST",
+      body: JSON.stringify({
+        gameStatus,
+        correctAnswers: score.correct,
+        incorrectAnswers: score.incorrect,
+        imagesUserPicked,
+        imagesToDisplay,
+        currentIndex,
+        endTime,
+        startTime,
+        isCustom,
+      }),
+    });
+    setIsLoading(false);
+
     setImagesUserPicked([]);
     setGameStatus(0);
     setScore({ correct: 0, incorrect: 0 });
@@ -616,7 +634,7 @@ function CardsGame() {
             </div>
           </div>
           <Button size="full" onClick={resetGame}>
-            Restart
+            {isLoading ? <FaSpinner className="animate-spin" /> : "Restart"}
           </Button>
         </div>
       )}

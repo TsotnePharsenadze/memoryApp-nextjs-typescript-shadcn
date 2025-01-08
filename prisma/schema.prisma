@@ -22,6 +22,11 @@ model User {
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+
+    GameStatsNumber GameStatsNumber[]
+    GameStatsWord   GameStatsWord[]
+    GameStatsCard   GameStatsCard[]
+    GameStatsImage  GameStatsImage[]
 }
 
 model Account {
@@ -76,4 +81,76 @@ model Authenticator {
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@id([userId, credentialID])
+}
+
+model GameStatsNumber {
+    id                String    @id @default(cuid())
+    userId            String
+    correctAnswers    Int       @default(0)
+    incorrectAnswers  Int       @default(0)
+    gameStatus        Int       @default(0)
+    numbersUserPicked Int[]     @default([])
+    numbersToDisplay  Int[]     @default([])
+    currentIndex      Int       @default(0)
+    startTime         DateTime?
+    endTime           DateTime?
+    createdAt         DateTime  @default(now())
+    updatedAt         DateTime  @updatedAt
+    isCustom          Boolean
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model GameStatsWord {
+    id               String    @id @default(cuid())
+    userId           String
+    correctAnswers   Int       @default(0)
+    incorrectAnswers Int       @default(0)
+    gameStatus       Int       @default(0)
+    wordsUserPicked  String[]  @default([])
+    wordsToDisplay   String[]  @default([])
+    currentIndex     Int       @default(0)
+    startTime        DateTime?
+    endTime          DateTime?
+    createdAt        DateTime  @default(now())
+    updatedAt        DateTime  @updatedAt
+    isCustom         Boolean
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model GameStatsImage {
+    id               String    @id @default(cuid())
+    userId           String
+    correctAnswers   Int       @default(0)
+    incorrectAnswers Int       @default(0)
+    gameStatus       Int       @default(0)
+    imagesUserPicked String[]  @default([])
+    imagesToDisplay  String[]  @default([])
+    currentIndex     Int       @default(0)
+    startTime        DateTime?
+    endTime          DateTime?
+    createdAt        DateTime  @default(now())
+    updatedAt        DateTime  @updatedAt
+    isCustom         Boolean
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model GameStatsCard {
+    id               String    @id @default(cuid())
+    userId           String
+    correctAnswers   Int       @default(0)
+    incorrectAnswers Int       @default(0)
+    gameStatus       Int       @default(0)
+    CardsUserPicked  String[]  @default([])
+    CardsToDisplay   String[]  @default([])
+    currentIndex     Int       @default(0)
+    startTime        DateTime?
+    endTime          DateTime?
+    createdAt        DateTime  @default(now())
+    updatedAt        DateTime  @updatedAt
+    isCustom         Boolean
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
