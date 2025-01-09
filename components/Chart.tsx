@@ -11,10 +11,9 @@ interface ChartData {
 interface GameChartProps {
   data: ChartData[];
   isLoading: boolean;
-  title: string;
 }
 
-export function GameChart({ data, title, isLoading }: GameChartProps) {
+export function GameChart({ data, isLoading }: GameChartProps) {
   const isEmpty = data.length === 0;
 
   const placeholderData = [
@@ -25,9 +24,8 @@ export function GameChart({ data, title, isLoading }: GameChartProps) {
   ];
 
   return (
-    <div className="relative mb-6 flex flex-col justify-center items-center mb-4">
-      <h3 className="text-lg font-bold mb-2">{title}</h3>
-      <div className={isEmpty ? "opacity-50 blur-[2px]" : ""}>
+    <div className="relative mb-9 flex flex-col justify-center items-center">
+      <div className={isEmpty || data.length < 2 ? "opacity-50 blur-[2px]" : ""}>
         <LineChart
           width={600}
           height={300}
@@ -49,7 +47,7 @@ export function GameChart({ data, title, isLoading }: GameChartProps) {
           </div>
         </div>
       )}
-      {!isLoading && isEmpty && data.length < 2 && (
+      {!isLoading && isEmpty || data.length < 2 && (
         <div className="absolute inset-0 flex items-center justify-center text-center">
           <div className="bg-white bg-opacity-80 p-4 rounded-md shadow-lg">
             <p className="text-lg font-semibold">

@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/sheet";
 import { RxHamburgerMenu } from "react-icons/rx";
 
-
 const Header = ({ homeHref }: { homeHref: string }) => {
   const router = useRouter();
   const session = useSession();
@@ -35,7 +34,9 @@ const Header = ({ homeHref }: { homeHref: string }) => {
   return (
     <div className="bg-white flex justify-between items-center pl-4 pr-4">
       <h1
-        className={`text-xl font-semibold cursor-pointer ${isMobile && "p-[8px_0_8px_0]"}`}
+        className={`text-xl font-semibold cursor-pointer ${
+          isMobile && "p-[8px_0_8px_0]"
+        }`}
         onClick={() => {
           router.push(homeHref);
         }}
@@ -69,6 +70,9 @@ const Header = ({ homeHref }: { homeHref: string }) => {
                     <Link href="/memoryApp/">
                       <li className="hover:bg-gray-50 p-2">Disciplines</li>
                     </Link>
+                    <Link href="/memoryApp/profile">
+                      <li className="hover:bg-gray-50 p-2">Profile</li>
+                    </Link>
                     <Link href="/memoryApp/dashboard">
                       <li className="hover:bg-gray-50 p-2">Dashboard</li>
                     </Link>
@@ -101,6 +105,9 @@ const Header = ({ homeHref }: { homeHref: string }) => {
               <>
                 <Link href="/memoryApp/">
                   <li className="hover:bg-gray-50 p-2">Disciplines</li>
+                </Link>
+                <Link href="/memoryApp/profile">
+                  <li className="hover:bg-gray-50 p-2">Profile</li>
                 </Link>
                 <Link href="/memoryApp/dashboard">
                   <li className="hover:bg-gray-50 p-2">Dashboard</li>

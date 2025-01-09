@@ -42,33 +42,53 @@ export default function Dashboard() {
 
   return (
     <div>
-      <div>
-        <GameChart
-          isLoading={isLoading}
-          data={numbersData}
-          title="Numbers Progress"
-        />
+      <div className="max-w-[600px] mx-auto">
+        <div className="flex justify-between items-center w-full">
+          <h3 className="text-lg font-bold mb-2">{`Numbers Progress`}</h3>
+          <a
+            href={`/memoryApp/numbers/`}
+            className="text-sky-500 hover:underline"
+          >
+            &#8608; Train
+          </a>
+        </div>
+        <GameChart isLoading={isLoading} data={numbersData} />
       </div>
-      <div>
-        <GameChart
-          isLoading={isLoading}
-          data={wordsData}
-          title="Words Progress"
-        />
+      <div className="max-w-[600px] mx-auto">
+        <div className="flex justify-between items-center w-full">
+          <h3 className="text-lg font-bold mb-2">{`Words Progress`}</h3>
+          <a
+            href={`/memoryApp/words/`}
+            className="text-sky-500 hover:underline"
+          >
+            &#8608; Train
+          </a>
+        </div>
+        <GameChart isLoading={isLoading} data={wordsData} />
       </div>
-      <div>
-        <GameChart
-          isLoading={isLoading}
-          data={imagesData}
-          title="Images Progress"
-        />
+      <div className="max-w-[600px] mx-auto">
+        <div className="flex justify-between items-center w-full">
+          <h3 className="text-lg font-bold mb-2">{`Images Progress`}</h3>
+          <a
+            href={`/memoryApp/images/`}
+            className="text-sky-500 hover:underline"
+          >
+            &#8608; Train
+          </a>
+        </div>
+        <GameChart isLoading={isLoading} data={imagesData} />
       </div>
-      <div>
-        <GameChart
-          isLoading={isLoading}
-          data={cardsData}
-          title="Cards Progress"
-        />
+      <div className="max-w-[600px] mx-auto">
+        <div className="flex justify-between items-center w-full">
+          <h3 className="text-lg font-bold mb-2">{`Cards Progress`}</h3>
+          <a
+            href={`/memoryApp/cards/`}
+            className="text-sky-500 hover:underline"
+          >
+            &#8608; Train
+          </a>
+        </div>
+        <GameChart isLoading={isLoading} data={cardsData} />
       </div>
     </div>
   );
