@@ -1,7 +1,124 @@
 "use client";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "./ui/button";
+import getLeaderboard from "@/actions/getLeaderboard";
+import { useEffect, useState } from "react";
+import type {
+  GameStatsWord,
+  GameStatsNumber,
+  GameStatsCard,
+  GameStatsImage,
+  User,
+} from "@prisma/client";
+import getUserById from "@/actions/getUserById";
+import Link from "next/link";
+import Spinner from "./Spinner";
+import { FaSpinner } from "react-icons/fa";
+
+type GameStatsNumberAug = GameStatsNumber & {
+  res: {
+    id: string;
+    username: string | null;
+  } | null;
+};
+type GameStatsWordAug = GameStatsWord & {
+  res: {
+    id: string;
+    username: string | null;
+  } | null;
+};
+type GameStatsCardAug = GameStatsCard & {
+  res: {
+    id: string;
+    username: string | null;
+  } | null;
+};
+type GameStatsImageAug = GameStatsImage & {
+  res: {
+    id: string;
+    username: string | null;
+  } | null;
+};
 
 const Leaderboard = () => {
+  const [leaderBoardNumbers, setLeaderBoardNumbers] = useState<
+    GameStatsNumberAug[] | null
+  >(null);
+  const [leaderBoardWords, setLeaderBoardWords] = useState<
+    GameStatsWordAug[] | null
+  >(null);
+  const [leaderBoardImages, setLeaderBoardImages] = useState<
+    GameStatsImageAug[] | null
+  >(null);
+  const [leaderBoardCards, setLeaderBoardCards] = useState<
+    GameStatsCardAug[] | null
+  >(null);
+
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const numbers = (await getLeaderboard("numbers")) as GameStatsNumber[];
+        if (numbers) {
+          const enrichedData = await Promise.all(
+            numbers.map(async (item) => {
+              const res = await getUserById(item.userId);
+              return { ...item, res };
+            })
+          );
+          setLeaderBoardNumbers(enrichedData);
+        }
+        const words = (await getLeaderboard("words")) as GameStatsWord[];
+        if (words) {
+          const enrichedData = await Promise.all(
+            words.map(async (item) => {
+              const res = await getUserById(item.userId);
+              return { ...item, res };
+            })
+          );
+          setLeaderBoardWords(enrichedData);
+        }
+        const images = (await getLeaderboard("images")) as GameStatsImage[];
+        if (images) {
+          const enrichedData = await Promise.all(
+            images.map(async (item) => {
+              const res = await getUserById(item.userId);
+              return { ...item, res };
+            })
+          );
+          setLeaderBoardImages(enrichedData);
+        }
+        const cards = (await getLeaderboard("cards")) as GameStatsCard[];
+        if (cards) {
+          const enrichedData = await Promise.all(
+            cards.map(async (item) => {
+              const res = await getUserById(item.userId);
+              return { ...item, res };
+            })
+          );
+          setLeaderBoardCards(enrichedData);
+        }
+      } catch (error) {
+        console.error("Error fetching leaderboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <div className="w-full max-w-[1200px] mx-auto mt-20 flex flex-col gap-4">
       <h1 className="text-3xl font-black">Leaderboard</h1>
@@ -75,7 +192,48 @@ const Leaderboard = () => {
           </div>
         </TabsList>
         <TabsContent value="numbers">
-          Make changes to your account here.
+          <Table className="bg-white rounded-sm shadow-lg">
+            <TableCaption>Refresh the page to update the list.</TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Correct Answers</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Username</TableHead>
+                <TableHead className="text-right"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {loading && (
+                <TableRow className="w-full">
+                  <TableCell className="w-full">
+                    <FaSpinner className="animate-spin mx-auto text-4xl" />
+                  </TableCell>
+                </TableRow>
+              )}
+              {leaderBoardNumbers?.map(async (item, index) => (
+                <TableRow className={`${index == 0 && "bg-yellow-200"}`}>
+                  <TableCell className="font-medium">
+                    <b>{item.correctAnswers}</b>
+                  </TableCell>
+                  <TableCell>
+                    <b>{new Date(item.createdAt).toLocaleString()}</b>
+                  </TableCell>
+                  <TableCell>
+                    <b>
+                      {item.res?.username} {index == 0 && "👑"}
+                    </b>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button asChild>
+                      <Link href={`/profile/${item.userId}`}>
+                        Visit Profile
+                      </Link>
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </TabsContent>
         <TabsContent value="words">
           Make changes to your account here.
