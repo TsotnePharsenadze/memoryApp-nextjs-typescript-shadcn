@@ -10,7 +10,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "./ui/button";
-import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import {
   FormControl,
@@ -20,33 +19,35 @@ import {
   FormMessage,
 } from "./ui/form";
 import { FormProvider, useForm } from "react-hook-form";
-import { passwordSchema } from "@/schemas";
+import { accounDeleteSchema, passwordSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { FaSpinner } from "react-icons/fa";
+import { setErrorMap, z } from "zod";
+import { FaSpinner, FaTrash } from "react-icons/fa";
 import Error from "./Error";
-import { signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
-export default function ChangePasswordModal() {
+export default function DeleteAccountModal() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [customError, setCustomError] = useState<string>("");
   const [dialogOpen, setDialogOpen] = useState(false);
-  const router = useRouter();
 
-  const form = useForm<z.infer<typeof passwordSchema>>({
-    resolver: zodResolver(passwordSchema),
+  const form = useForm<z.infer<typeof accounDeleteSchema>>({
+    resolver: zodResolver(accounDeleteSchema),
     defaultValues: {
-      currentPassword: "",
-      password: "",
-      confirmPassword: "",
+      keyword: "",
     },
   });
 
-  const onSubmitPassword = async (values: z.infer<typeof passwordSchema>) => {
+  const onSubmitPassword = async (
+    values: z.infer<typeof accounDeleteSchema>
+  ) => {
+    if (values.keyword !== "DELETE") {
+      setCustomError("Make sure that word is DELETE in uppercase");
+      return;
+    }
     setIsLoading(true);
     try {
-      const response = await fetch("/api/profile/password-update", {
+      const response = await fetch("/api/profile/account-delete", {
         method: "POST",
         body: JSON.stringify(values),
         headers: {
@@ -63,8 +64,6 @@ export default function ChangePasswordModal() {
         setCustomError("Something went wrong");
       } else {
         closeDialog();
-        signOut();
-        router.push("/");
       }
     } catch (err) {
       console.log(err);
@@ -76,60 +75,37 @@ export default function ChangePasswordModal() {
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Change password</Button>
+        <Button
+          type="button"
+          variant="outline"
+          className="bg-red-600 text-white hover:bg-red-700 hover:text-white"
+        >
+          <FaTrash /> Delete Account
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Edit password</DialogTitle>
+          <DialogTitle>Delete Account</DialogTitle>
+          <DialogDescription>
+            All the records will be lost and you will be removed from
+            leaderboard!
+          </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <FormProvider {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmitPassword)}
-              id="passwordForm"
-            >
+            <form onSubmit={form.handleSubmit(onSubmitPassword)}>
               <div className="grid grid-cols-4 items-center gap-4">
                 <FormField
                   control={form.control}
-                  name="currentPassword"
+                  name="keyword"
                   render={({ field }) => (
                     <FormItem className="col-span-4">
-                      <FormLabel>Current Password</FormLabel>
+                      <FormLabel>
+                        Enter <span className="text-red-500">"DELETE"</span>{" "}
+                        (Consider uppercase)
+                      </FormLabel>
                       <FormControl>
-                        <Input type="password" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <br />
-              <hr />
-              <br />
-              <div className="grid grid-cols-4 items-center gap-4">
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem className="col-span-4">
-                      <FormLabel>New Password</FormLabel>
-                      <FormControl>
-                        <Input type="password" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <FormField
-                  control={form.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem className="col-span-4">
-                      <FormLabel>Confirm New Password</FormLabel>
-                      <FormControl>
-                        <Input type="password" {...field} />
+                        <Input type="text" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -142,11 +118,16 @@ export default function ChangePasswordModal() {
                 )}
               </div>
               <DialogFooter className="mt-4">
-                <Button type="submit" disabled={isLoading} className="mt-4">
+                <Button
+                  type="submit"
+                  variant="destructive"
+                  disabled={isLoading}
+                  className="mt-4"
+                >
                   {isLoading ? (
                     <FaSpinner className="animate-spin" />
                   ) : (
-                    "Save changes"
+                    "Delete Account"
                   )}
                 </Button>
               </DialogFooter>

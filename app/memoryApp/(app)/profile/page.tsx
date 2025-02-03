@@ -2,6 +2,7 @@
 
 import getUserById from "@/actions/getUserById";
 import ChangePasswordModal from "@/components/ChangePasswordModal";
+import DeleteAccountModal from "@/components/DeleteAccountModal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -196,14 +197,7 @@ const ProfilePage = () => {
                     )}
                   </Button>
                   <div className="flex gap-2">
-                    <Link href="/change-password">
-                      <Button
-                        variant="outline"
-                        className="bg-red-600 text-white hover:bg-red-700 hover:text-white"
-                      >
-                        <FaTrash /> Delete Account
-                      </Button>
-                    </Link>
+                    <DeleteAccountModal />
 
                     <ChangePasswordModal />
                   </div>
