@@ -49,20 +49,19 @@ export function GameChart({ data, isLoading }: GameChartProps) {
           </div>
         </div>
       )}
-      {(!isLoading && isEmpty) ||
-        (!isLoading && data.length < 2 && (
-          <div className="absolute inset-0 flex items-center justify-center text-center">
-            <div className="bg-white bg-opacity-80 p-4 rounded-md shadow-lg">
-              <p className="text-lg font-semibold">
-                Play the game to see your progress! <br />
-                <i className="text-xs text-gray-600">
-                  (You need to play for this game for at least 2 times for
-                  statistics)
-                </i>
-              </p>
-            </div>
+      {!isLoading && isEmpty && data.length < 2 && (
+        <div className="absolute inset-0 flex items-center justify-center text-center">
+          <div className="bg-white bg-opacity-80 p-4 rounded-md shadow-lg">
+            <p className="text-lg font-semibold">
+              Play the game to see your progress! <br />
+              <i className="text-xs text-gray-600">
+                (You need to play for this game for at least 2 times for
+                statistics)
+              </i>
+            </p>
           </div>
-        ))}
+        </div>
+      )}
     </div>
   );
 }

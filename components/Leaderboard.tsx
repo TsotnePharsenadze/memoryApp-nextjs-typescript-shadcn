@@ -18,12 +18,10 @@ import type {
   GameStatsNumber,
   GameStatsCard,
   GameStatsImage,
-  User,
 } from "@prisma/client";
 import getUserById from "@/actions/getUserById";
 import Link from "next/link";
-import Spinner from "./Spinner";
-import { FaSpinner } from "react-icons/fa";
+import { getTimeTaken } from "@/lib/utils";
 
 type GameStatsNumberAug = GameStatsNumber & {
   res: {
@@ -31,6 +29,7 @@ type GameStatsNumberAug = GameStatsNumber & {
     username: string | null;
   } | null;
 };
+
 type GameStatsWordAug = GameStatsWord & {
   res: {
     id: string;
@@ -197,52 +196,183 @@ const Leaderboard = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Correct Answers</TableHead>
+                <TableHead>Time Taken</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Username</TableHead>
                 <TableHead className="text-right"></TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
-              {loading && (
-                <TableRow className="w-full">
-                  <TableCell className="w-full">
-                    <FaSpinner className="animate-spin mx-auto text-4xl" />
-                  </TableCell>
-                </TableRow>
-              )}
-              {leaderBoardNumbers?.map(async (item, index) => (
-                <TableRow className={`${index == 0 && "bg-yellow-200"}`}>
-                  <TableCell className="font-medium">
-                    <b>{item.correctAnswers}</b>
-                  </TableCell>
-                  <TableCell>
-                    <b>{new Date(item.createdAt).toLocaleString()}</b>
-                  </TableCell>
-                  <TableCell>
-                    <b>
-                      {item.res?.username} {index == 0 && "👑"}
-                    </b>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button asChild>
-                      <Link href={`/profile/${item.userId}`}>
-                        Visit Profile
-                      </Link>
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
+            <TableBody className="min-h-[52px]">
+              {leaderBoardNumbers?.map((item, index) => {
+                return (
+                  <TableRow
+                    key={index}
+                    className={`${index == 0 && "bg-yellow-200"}`}
+                  >
+                    <TableCell className="font-medium">
+                      <b>{item.correctAnswers}</b>
+                    </TableCell>
+                    <TableCell>
+                      <b>{getTimeTaken(item.endTime, item.startTime)}</b>
+                    </TableCell>
+                    <TableCell>
+                      <b>{new Date(item.createdAt).toLocaleString()}</b>
+                    </TableCell>
+                    <TableCell>
+                      <b>
+                        {item.res?.username} {index == 0 && "👑"}
+                      </b>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button asChild>
+                        <Link href={`/profile/${item.userId}`}>
+                          Visit Profile
+                        </Link>
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </TabsContent>
         <TabsContent value="words">
-          Make changes to your account here.
+          <Table className="bg-white rounded-sm shadow-lg">
+            <TableCaption>Refresh the page to update the list.</TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Correct Answers</TableHead>
+                <TableHead>Time Taken</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Username</TableHead>
+                <TableHead className="text-right"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="min-h-[52px]">
+              {leaderBoardWords?.map((item, index) => {
+                return (
+                  <TableRow
+                    key={index}
+                    className={`${index == 0 && "bg-yellow-200"}`}
+                  >
+                    <TableCell className="font-medium">
+                      <b>{item.correctAnswers}</b>
+                    </TableCell>
+                    <TableCell>
+                      <b>{getTimeTaken(item.endTime, item.startTime)}</b>
+                    </TableCell>
+                    <TableCell>
+                      <b>{new Date(item.createdAt).toLocaleString()}</b>
+                    </TableCell>
+                    <TableCell>
+                      <b>
+                        {item.res?.username} {index == 0 && "👑"}
+                      </b>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button asChild>
+                        <Link href={`/profile/${item.userId}`}>
+                          Visit Profile
+                        </Link>
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
         </TabsContent>
         <TabsContent value="images">
-          Make changes to your account here.
+          <Table className="bg-white rounded-sm shadow-lg">
+            <TableCaption>Refresh the page to update the list.</TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Correct Answers</TableHead>
+                <TableHead>Time Taken</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Username</TableHead>
+                <TableHead className="text-right"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="min-h-[52px]">
+              {leaderBoardImages?.map((item, index) => {
+                return (
+                  <TableRow
+                    key={index}
+                    className={`${index == 0 && "bg-yellow-200"}`}
+                  >
+                    <TableCell className="font-medium">
+                      <b>{item.correctAnswers}</b>
+                    </TableCell>
+                    <TableCell>
+                      <b>{getTimeTaken(item.endTime, item.startTime)}</b>
+                    </TableCell>
+                    <TableCell>
+                      <b>{new Date(item.createdAt).toLocaleString()}</b>
+                    </TableCell>
+                    <TableCell>
+                      <b>
+                        {item.res?.username} {index == 0 && "👑"}
+                      </b>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button asChild>
+                        <Link href={`/profile/${item.userId}`}>
+                          Visit Profile
+                        </Link>
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
         </TabsContent>
         <TabsContent value="cards">
-          Make changes to your account here.
+          <Table className="bg-white rounded-sm shadow-lg">
+            <TableCaption>Refresh the page to update the list.</TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Correct Answers</TableHead>
+                <TableHead>Time Taken</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Username</TableHead>
+                <TableHead className="text-right"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="min-h-[52px]">
+              {leaderBoardCards?.map((item, index) => {
+                return (
+                  <TableRow
+                    key={index}
+                    className={`${index == 0 && "bg-yellow-200"}`}
+                  >
+                    <TableCell className="font-medium">
+                      <b>{item.correctAnswers}</b>
+                    </TableCell>
+                    <TableCell>
+                      <b>{getTimeTaken(item.endTime, item.startTime)}</b>
+                    </TableCell>
+                    <TableCell>
+                      <b>{new Date(item.createdAt).toLocaleString()}</b>
+                    </TableCell>
+                    <TableCell>
+                      <b>
+                        {item.res?.username} {index == 0 && "👑"}
+                      </b>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button asChild>
+                        <Link href={`/profile/${item.userId}`}>
+                          Visit Profile
+                        </Link>
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
         </TabsContent>
       </Tabs>
     </div>

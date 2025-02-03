@@ -20,20 +20,40 @@ export default async function getLeaderboard(
   switch (type) {
     case "numbers":
       const numbers = await prisma.gameStatsNumber.findMany({
+        where: {
+          isCustom: false,
+        },
         orderBy: [{ correctAnswers: "desc" }],
         take: 5,
       });
 
+      // return numbers.sort((a, b) => {
+      //   const timeA =
+      //     a.startTime && a.endTime
+      //       ? new Date(a.endTime).getTime() - new Date(a.startTime).getTime()
+      //       : Number.MAX_SAFE_INTEGER;
+      //   const timeB =
+      //     b.startTime && b.endTime
+      //       ? new Date(b.endTime).getTime() - new Date(b.startTime).getTime()
+      //       : Number.MAX_SAFE_INTEGER;
+      //   return timeA - timeB;
+      // });
       return numbers.sort((a, b) => {
-        const timeA =
-          a.startTime && a.endTime
-            ? new Date(a.endTime).getTime() - new Date(a.startTime).getTime()
-            : Number.MAX_SAFE_INTEGER;
-        const timeB =
-          b.startTime && b.endTime
-            ? new Date(b.endTime).getTime() - new Date(b.startTime).getTime()
-            : Number.MAX_SAFE_INTEGER;
-        return timeA - timeB;
+        const correctAnswersA = a.correctAnswers ?? Number.MIN_SAFE_INTEGER;
+        const correctAnswersB = b.correctAnswers ?? Number.MIN_SAFE_INTEGER;
+        if (correctAnswersA == correctAnswersB) {
+          const timeA =
+            a.startTime && a.endTime
+              ? new Date(a.endTime).getTime() - new Date(a.startTime).getTime()
+              : Number.MAX_SAFE_INTEGER;
+          const timeB =
+            b.startTime && b.endTime
+              ? new Date(b.endTime).getTime() - new Date(b.startTime).getTime()
+              : Number.MAX_SAFE_INTEGER;
+          return timeA - timeB;
+        } else {
+          return correctAnswersB - correctAnswersA;
+        }
       });
 
     case "cards":
