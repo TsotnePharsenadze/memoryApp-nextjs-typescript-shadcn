@@ -7,10 +7,6 @@ export default async function getUserById(id: string) {
     where: {
       id,
     },
-    select: {
-      id: true,
-      username: true,
-    },
   });
   return user;
 }
