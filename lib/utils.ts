@@ -23,3 +23,15 @@ export function getTimeTaken(timeA: Date | null, timeB: Date | null): string {
     return `${Math.floor(time / 3600)}h`;
   }
 }
+
+export const getChangedValues = (
+  oldObj: Record<string, any>,
+  newObj: Record<string, any>
+) => {
+  return Object.keys(newObj).reduce((diff, key) => {
+    if (oldObj[key] !== newObj[key]) {
+      diff[key] = newObj[key];
+    }
+    return diff;
+  }, {} as Record<string, any>);
+};

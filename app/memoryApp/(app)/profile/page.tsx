@@ -1,38 +1,107 @@
 "use client";
 
 import getUserById from "@/actions/getUserById";
+import ChangePasswordModal from "@/components/ChangePasswordModal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { getChangedValues } from "@/lib/utils";
+import { profileSchema } from "@/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { User } from "@prisma/client";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { FaTrash } from "react-icons/fa";
+import { Form, FormProvider, useForm } from "react-hook-form";
+import { FaSpinner, FaTrash } from "react-icons/fa";
+import { z } from "zod";
 
 const ProfilePage = () => {
-  // const [fullUserData, setFullUserData] = useState<User | null>(null);
-  // const user = useSession();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [fullUserData, setFullUserData] = useState<User | null>(null);
+  const [isModified, setIsModified] = useState<boolean>(false);
+  const [initialValues, setInitialValues] = useState<z.infer<
+    typeof profileSchema
+  > | null>(null);
+  const user = useSession();
 
-  // useEffect(() => {
-  //   async function fetchUserData() {
-  //     const res = await getUserById(user?.data?.user?.id as string);
-  //     setFullUserData(res);
-  //   }
-  //   if (user.status === "authenticated") {
-  //     fetchUserData();
-  //   }
-  // }, [user]);
+  const onSubmit = async (values: z.infer<typeof profileSchema>) => {
+    const newValues = getChangedValues(fullUserData!, values);
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/profile", {
+        method: "POST",
+        body: JSON.stringify(newValues),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-  const [user, setUser] = useState<any>({
-    name: "John",
-    surname: "Doe",
-    username: "johndoe123",
-    email: "john.doe@example.com",
-    avatarUrl:
-      "https://fastly.picsum.photos/id/538/200/300.jpg?hmac=QyW9exvhaGnW9uknxjXGZYm6JAtg9ctqbnYTTwBk61o",
+      const data = await response.json();
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const form = useForm<z.infer<typeof profileSchema>>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      name: "",
+      surname: "",
+      username: "",
+      email: "",
+    },
   });
+
+  useEffect(() => {
+    async function fetchUserData() {
+      const res = await getUserById(user?.data?.user?.id as string);
+      setFullUserData(res);
+    }
+    if (user.status === "authenticated") {
+      fetchUserData();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (fullUserData) {
+      form.reset({
+        name: fullUserData.name || "",
+        surname: fullUserData.surname || "",
+        username: fullUserData.username || "",
+        email: fullUserData.email || "",
+      });
+      setInitialValues({
+        name: fullUserData.name || "",
+        surname: fullUserData.surname || "",
+        username: fullUserData.username || "",
+        email: fullUserData.email || "",
+      });
+    }
+  }, [fullUserData, form.reset]);
+
+  useEffect(() => {
+    if (!initialValues) return;
+
+    const currentValues = form.getValues();
+    const hasChanges = Object.keys(initialValues).some((key) => {
+      const typedKey = key as keyof typeof initialValues;
+      return currentValues[typedKey] !== initialValues[typedKey];
+    });
+
+    setIsModified(hasChanges);
+  }, [form.watch(), initialValues]);
 
   return (
     <div className="max-w-4xl mx-auto p-4">
@@ -40,49 +109,107 @@ const ProfilePage = () => {
         <CardHeader>
           <div className="flex items-center space-x-4">
             <Avatar>
-              <AvatarImage src={user.avatarUrl} alt="@shadcn" />
-              <AvatarFallback>{user.avatarUrl}</AvatarFallback>
+              <AvatarImage src="/user.jpg" alt="@shadcn" />
+              <AvatarFallback>
+                <Image src="/user.jpg" fill alt={"Fallback image of Avatar"} />
+              </AvatarFallback>
             </Avatar>
             <div>
               <h2 className="text-xl font-semibold">
-                {user.name} {user.surname}
+                {fullUserData?.name} {fullUserData?.surname}
               </h2>
-              <p className="text-sm text-gray-600">@{user.username}</p>
+              <p className="text-sm text-gray-600">@{fullUserData?.username}</p>
             </div>
           </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div className="flex gap-4">
-              <div className="flex flex-col flex-1">
-                <p>Name</p>
-                <Input value={user.name} readOnly />
-              </div>
-              <div className="flex flex-col flex-1">
-                <p>Surname</p>
-                <Input value={user.surname} readOnly />
-              </div>
-            </div>
-            <div className="flex gap-4">
-              <div className="flex flex-col flex-1">
-                <p>Username</p>
-                <Input value={user.username} readOnly />
-              </div>
-              <div className="flex flex-col flex-1">
-                <p>Name</p>
-                <Input value={user.email} readOnly />
-              </div>
-            </div>
-            <div className="flex justify-between">
-              <Link href="/change-password">
-                <Button variant="outline" className="bg-red-600 text-white hover:bg-red-700 hover:text-white">
-                  <FaTrash /> Delete Account
-                </Button>
-              </Link>
-              <Link href="/change-password">
-                <Button variant="outline">Change Password</Button>
-              </Link>
-            </div>
+            <FormProvider {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)}>
+                <div className="flex gap-4">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
+                          <Input type="text" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="surname"
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Surname</FormLabel>
+                        <FormControl>
+                          <Input type="text" {...field} className="flex-1" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="flex gap-4">
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input type="email" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="username"
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Username</FormLabel>
+                        <FormControl>
+                          <Input type="text" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="flex justify-between mt-4">
+                  <Button
+                    type="submit"
+                    className={`max-w-[84px] w-full text-center`}
+                    disabled={!isModified || isLoading}
+                  >
+                    {isLoading ? (
+                      <FaSpinner className="animate-spin" />
+                    ) : (
+                      "Update"
+                    )}
+                  </Button>
+                  <div className="flex gap-2">
+                    <Link href="/change-password">
+                      <Button
+                        variant="outline"
+                        className="bg-red-600 text-white hover:bg-red-700 hover:text-white"
+                      >
+                        <FaTrash /> Delete Account
+                      </Button>
+                    </Link>
+
+                    <ChangePasswordModal />
+                  </div>
+                </div>
+              </form>
+            </FormProvider>
           </div>
         </CardContent>
       </Card>

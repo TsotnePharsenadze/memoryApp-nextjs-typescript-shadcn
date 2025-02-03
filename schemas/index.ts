@@ -86,6 +86,9 @@ export const profileSchema = z.object({
     .max(31, {
       message: "Username must contain less than 32 character(s)",
     }),
+});
+
+export const passwordSchema = z.object({
   password: z
     .string()
     .min(8, {
