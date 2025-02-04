@@ -1,11 +1,14 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { useParams } from "next/navigation";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
   const currentUser = await auth();
 
-  const userId = currentUser?.user?.id;
+  const params = useParams();
+
+  const userId = params?.id as string;
 
   if (!userId) {
     return NextResponse.json(
