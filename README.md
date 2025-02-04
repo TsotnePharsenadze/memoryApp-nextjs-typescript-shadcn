@@ -21,3 +21,6 @@ NEXT_PUBLIC_API_NINJA_KEY="/VStL8C8BgwaVBmen8xzXw==aRTCas5I6jlsTPhM"
 
 ![image](https://github.com/user-attachments/assets/ba333fde-1803-4605-b751-2bf6c88c3551)
 
+![image](https://github.com/user-attachments/assets/ebd9afce-26ca-4d4d-a687-ff06c09a5f0a)
+
+![image](https://github.com/user-attachments/assets/a3f70364-ff0a-4b1f-ae3b-905e63feb830)
