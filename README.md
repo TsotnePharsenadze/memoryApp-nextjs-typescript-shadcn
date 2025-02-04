@@ -1,3 +1,8 @@
+DATABASE_URL="postgresql://neondb_owner:6Sonz7MiBNfx@ep-young-resonance-a5ob274t.us-east-2.aws.neon.tech/neondb?sslmode=require"
+
+AUTH_SECRET="3BhTEP4jswAF+SmGEnSsjQQBA051jkZdoIJlRZMqnOM="
+
+NEXT_PUBLIC_API_NINJA_KEY="/VStL8C8BgwaVBmen8xzXw==aRTCas5I6jlsTPhM"
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
