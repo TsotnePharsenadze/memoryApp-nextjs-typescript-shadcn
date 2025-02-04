@@ -61,7 +61,7 @@ export default function Dashboard() {
     <div>
       <div className="max-w-[600px] mx-auto">
         <h1 className="mb-4 text-4xl font-black text-center border-b-black border-b-4">
-          Dashboard of user: {userWithFullData?.username}
+          Dashboard of user: @{userWithFullData?.username}
         </h1>
         <div className="flex justify-between items-center w-full">
           <h3 className="text-lg font-bold mb-2">{`Numbers Progress`}</h3>
