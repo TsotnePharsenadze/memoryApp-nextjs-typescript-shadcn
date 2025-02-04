@@ -225,8 +225,8 @@ const Leaderboard = () => {
                     </TableCell>
                     <TableCell className="text-right">
                       <Button asChild>
-                        <Link href={`/profile/${item.userId}`}>
-                          Visit Profile
+                        <Link href={`/memoryApp/dashboard/${item.userId}`}>
+                          Visit Dashboard
                         </Link>
                       </Button>
                     </TableCell>
@@ -271,8 +271,8 @@ const Leaderboard = () => {
                     </TableCell>
                     <TableCell className="text-right">
                       <Button asChild>
-                        <Link href={`/profile/${item.userId}`}>
-                          Visit Profile
+                        <Link href={`/memoryApp/dashboard/${item.userId}`}>
+                          Visit Dashboard
                         </Link>
                       </Button>
                     </TableCell>
@@ -317,8 +317,8 @@ const Leaderboard = () => {
                     </TableCell>
                     <TableCell className="text-right">
                       <Button asChild>
-                        <Link href={`/profile/${item.userId}`}>
-                          Visit Profile
+                        <Link href={`/memoryApp/dashboard/${item.userId}`}>
+                          Visit Dashboard
                         </Link>
                       </Button>
                     </TableCell>
@@ -363,8 +363,8 @@ const Leaderboard = () => {
                     </TableCell>
                     <TableCell className="text-right">
                       <Button asChild>
-                        <Link href={`/profile/${item.userId}`}>
-                          Visit Profile
+                        <Link href={`/memoryApp/dashboard/${item.userId}`}>
+                          Visit Dashboard
                         </Link>
                       </Button>
                     </TableCell>
