@@ -19,9 +19,9 @@ import {
   FormMessage,
 } from "./ui/form";
 import { FormProvider, useForm } from "react-hook-form";
-import { accounDeleteSchema, passwordSchema } from "@/schemas";
+import { accounDeleteSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { setErrorMap, z } from "zod";
+import { z } from "zod";
 import { FaSpinner, FaTrash } from "react-icons/fa";
 import Error from "./Error";
 import { DialogDescription } from "@radix-ui/react-dialog";

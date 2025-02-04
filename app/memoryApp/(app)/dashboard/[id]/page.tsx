@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { GameChart } from "@/components/Chart";
 import getUserById from "@/actions/getUserById";
 import { User } from "@prisma/client";
