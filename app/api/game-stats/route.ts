@@ -2,9 +2,15 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(
+  req: Request,
+  { params }: { params: { id?: string } }
+) {
   const currentUser = await auth();
-  if (!currentUser?.user?.id) {
+
+  const userId = params?.id || currentUser?.user?.id;
+
+  if (!userId) {
     return NextResponse.json(
       { message: "Unauthorized request" },
       { status: 401 }
@@ -12,7 +18,7 @@ export async function GET() {
   }
 
   const numbers = await prisma.gameStatsNumber.findMany({
-    where: { userId: currentUser?.user?.id },
+    where: { userId },
     select: {
       createdAt: true,
       correctAnswers: true,
@@ -20,7 +26,7 @@ export async function GET() {
   });
 
   const words = await prisma.gameStatsWord.findMany({
-    where: { userId: currentUser?.user?.id },
+    where: { userId },
     select: {
       createdAt: true,
       correctAnswers: true,
@@ -28,7 +34,7 @@ export async function GET() {
   });
 
   const images = await prisma.gameStatsImage.findMany({
-    where: { userId: currentUser?.user?.id },
+    where: { userId },
     select: {
       createdAt: true,
       correctAnswers: true,
@@ -36,7 +42,7 @@ export async function GET() {
   });
 
   const cards = await prisma.gameStatsCard.findMany({
-    where: { userId: currentUser?.user?.id },
+    where: { userId },
     select: {
       createdAt: true,
       correctAnswers: true,
@@ -45,10 +51,10 @@ export async function GET() {
 
   return new Response(
     JSON.stringify({
-      numbers: numbers || {},
-      words: words || {},
-      images: images || {},
-      cards: cards || {},
+      numbers: numbers || [],
+      words: words || [],
+      images: images || [],
+      cards: cards || [],
     }),
     { status: 200 }
   );
