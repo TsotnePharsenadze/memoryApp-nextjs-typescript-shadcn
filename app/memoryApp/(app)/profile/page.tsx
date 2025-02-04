@@ -20,10 +20,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { User } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Form, FormProvider, useForm } from "react-hook-form";
-import { FaSpinner, FaTrash } from "react-icons/fa";
+import { FormProvider, useForm } from "react-hook-form";
+import { FaSpinner } from "react-icons/fa";
 import { z } from "zod";
 
 const ProfilePage = () => {
