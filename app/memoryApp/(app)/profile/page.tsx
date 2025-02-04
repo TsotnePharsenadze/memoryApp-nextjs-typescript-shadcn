@@ -105,7 +105,7 @@ const ProfilePage = () => {
   }, [form.watch(), initialValues]);
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
+    <div className="max-w-4xl mx-auto sm:p-4">
       <Card>
         <CardHeader>
           <div className="flex items-center space-x-4">
@@ -127,7 +127,7 @@ const ProfilePage = () => {
           <div className="space-y-4">
             <FormProvider {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)}>
-                <div className="flex gap-4">
+                <div className="flex gap-4 sm:flex-row flex-col">
                   <FormField
                     control={form.control}
                     name="name"
@@ -155,7 +155,7 @@ const ProfilePage = () => {
                     )}
                   />
                 </div>
-                <div className="flex gap-4">
+                <div className="flex gap-4 sm:flex-row flex-col">
                   <FormField
                     control={form.control}
                     name="email"
@@ -184,10 +184,10 @@ const ProfilePage = () => {
                   />
                 </div>
 
-                <div className="flex justify-between mt-4">
+                <div className="flex justify-between mt-4 sm:flex-row flex-col gap-4">
                   <Button
                     type="submit"
-                    className={`max-w-[84px] w-full text-center`}
+                    className={`sm:max-w-[84px] w-full text-center`}
                     disabled={!isModified || isLoading}
                   >
                     {isLoading ? (
@@ -196,7 +196,7 @@ const ProfilePage = () => {
                       "Update"
                     )}
                   </Button>
-                  <div className="flex gap-2">
+                  <div className="flex sm:flex-row flex-col gap-4">
                     <DeleteAccountModal />
 
                     <ChangePasswordModal />
