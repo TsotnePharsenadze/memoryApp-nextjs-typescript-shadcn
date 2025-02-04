@@ -1,11 +1,10 @@
-import { auth } from "@/auth";
+"use client";
+
 import { prisma } from "@/lib/prisma";
 import { useParams } from "next/navigation";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
-  const currentUser = await auth();
-
   const params = useParams();
 
   const userId = params?.id as string;
