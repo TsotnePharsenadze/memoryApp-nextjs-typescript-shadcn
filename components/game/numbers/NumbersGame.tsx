@@ -63,7 +63,9 @@ function NumbersGame() {
     e.preventDefault();
     setGameStatus(1);
     setStartTime(Date.now());
-    setNumbersToDisplay([]);
+
+    const newNumbers: string[] = [];
+
     if (isCustom) {
       if (isInRangeOf) {
         const max =
@@ -79,25 +81,20 @@ function NumbersGame() {
             ? 999999
             : 99;
         for (let i = 0; i < amountOfNumbers; i++) {
-          setNumbersToDisplay((prev) => [
-            ...prev,
-            randomInRangeNumberGenerator(0, max),
-          ]);
+          newNumbers.push(randomInRangeNumberGenerator(0, max));
         }
       } else {
         for (let i = 0; i < amountOfNumbers; i++) {
-          setNumbersToDisplay((prev) => [
-            ...prev,
-            randomInGroupNumberGenerator(inGroupsOf),
-          ]);
+          newNumbers.push(randomInGroupNumberGenerator(inGroupsOf));
         }
       }
     } else {
       for (let i = 0; i < amountOfNumbers; i++) {
-        const n = randomInRangeNumberGenerator(0, 99);
-        setNumbersToDisplay((prev) => [...prev, n]);
+        newNumbers.push(randomInRangeNumberGenerator(0, 99));
       }
     }
+
+    setNumbersToDisplay(newNumbers);
   };
 
   const recite = (): void => {
@@ -135,35 +132,46 @@ function NumbersGame() {
       "#originalSequenceOfNumbers"
     ) as HTMLElement;
 
-    if (lightUp) {
-      originalSequenceOfNumbers.children[index].classList.add("text-red-800");
-      originalSequenceOfNumbers.children[index].classList.remove(
-        "text-green-800"
-      );
-    } else {
-      originalSequenceOfNumbers.children[index].classList.add("text-green-800");
-      originalSequenceOfNumbers.children[index].classList.remove(
-        "text-red-800"
-      );
+    if (
+      originalSequenceOfNumbers &&
+      originalSequenceOfNumbers.children[index]
+    ) {
+      if (lightUp) {
+        originalSequenceOfNumbers.children[index].classList.add("text-red-800");
+        originalSequenceOfNumbers.children[index].classList.remove(
+          "text-green-800"
+        );
+      } else {
+        originalSequenceOfNumbers.children[index].classList.add(
+          "text-green-800"
+        );
+        originalSequenceOfNumbers.children[index].classList.remove(
+          "text-red-800"
+        );
+      }
     }
   };
 
   const resetGame = async (): Promise<void> => {
     setIsLoading(true);
-    await fetch("/api/game/number/", {
-      method: "POST",
-      body: JSON.stringify({
-        numbersUserPicked,
-        gameStatus,
-        correctAnswers: score.correct,
-        incorrectAnswers: score.incorrect,
-        numbersToDisplay,
-        currentIndex,
-        endTime,
-        startTime,
-        isCustom,
-      }),
-    });
+    try {
+      await fetch("/api/game/number/", {
+        method: "POST",
+        body: JSON.stringify({
+          numbersUserPicked,
+          gameStatus,
+          correctAnswers: score.correct,
+          incorrectAnswers: score.incorrect,
+          numbersToDisplay,
+          currentIndex,
+          endTime,
+          startTime,
+          isCustom,
+        }),
+      });
+    } catch (error) {
+      console.error("Error saving game data:", error);
+    }
     setIsLoading(false);
     setNumbersUserPicked([]);
     setGameStatus(0);
@@ -216,7 +224,6 @@ function NumbersGame() {
       }
     }
   };
-
   return (
     <div className="bg-blue-50 h-screen sm:p-6 flex flex-col items-center">
       {gameStatus === 0 && (
@@ -454,7 +461,11 @@ function NumbersGame() {
             </div>
           </div>
           <Button size="full" onClick={resetGame}>
-            {isLoading ? <FaSpinner className="animate-spin" /> : "Save and Restart"}
+            {isLoading ? (
+              <FaSpinner className="animate-spin" />
+            ) : (
+              "Save and Restart"
+            )}
           </Button>
         </div>
       )}
