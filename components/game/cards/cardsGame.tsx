@@ -141,52 +141,63 @@ function CardsGame() {
         setTypes(currentTypes);
       }
 
-      const selectedImages: string[] = [];
       const activeTypes = Object.entries(currentTypes)
         .filter(([, isEnabled]) => isEnabled)
         .map(([type]) => type.charAt(0).toUpperCase());
 
       const filteredImagePaths = imagePaths.filter((path) =>
-        activeTypes.some((type) => path.includes(type))
+        activeTypes.some((type) => path.endsWith(`${type}.svg`))
       );
 
-      filteredImagePaths.sort(() => Math.random() - 0.5);
+      if (filteredImagePaths.length === 0) {
+        console.error("No cards match the selected types");
+        setIsLoadingImages(false);
+        return;
+      }
+
+      const selectedImages: string[] = [];
+
+      const shuffledPaths = [...filteredImagePaths].sort(
+        () => Math.random() - 0.5
+      );
 
       if (isCustom) {
         if (isUnique) {
-          if (amountOfImages > filteredImagePaths.length) {
-            let tempImages = amountOfImages;
-            while (tempImages > 0) {
-              if (tempImages > filteredImagePaths.length) {
-                for (let i = 0; i < filteredImagePaths.length; i++) {
-                  selectedImages.push(`/cards/${filteredImagePaths[i]}`);
-                  filteredImagePaths.sort(() => Math.random() - 0.5);
-                }
-              } else {
-                for (let i = 0; i < tempImages; i++) {
-                  selectedImages.push(`/cards/${filteredImagePaths[i]}`);
-                  filteredImagePaths.sort(() => Math.random() - 0.5);
-                }
-              }
-              tempImages -= filteredImagePaths.length;
+          let tempAmount = amountOfImages;
+          console.log(tempAmount);
+          let tempPaths = [...shuffledPaths];
+
+          while (selectedImages.length < amountOfImages) {
+            if (tempPaths.length === 0) {
+              tempPaths = [...shuffledPaths].sort(() => Math.random() - 0.5);
             }
-          } else {
-            for (let i = 0; i < amountOfImages; i++) {
-              selectedImages.push(`/cards/${filteredImagePaths[i]}`);
-            }
+
+            selectedImages.push(`/cards/${tempPaths.shift()}`);
           }
         } else {
           for (let i = 0; i < amountOfImages; i++) {
-            const randomImage =
-              filteredImagePaths[
-                Math.floor(Math.random() * filteredImagePaths.length)
-              ];
-            selectedImages.push(`/cards/${randomImage}`);
+            const randomIndex = Math.floor(
+              Math.random() * filteredImagePaths.length
+            );
+            selectedImages.push(`/cards/${filteredImagePaths[randomIndex]}`);
           }
         }
       } else {
-        for (let i = 0; i < amountOfImages; i++) {
-          selectedImages.push(`/cards/${filteredImagePaths[i]}`);
+        for (
+          let i = 0;
+          i < Math.min(amountOfImages, shuffledPaths.length);
+          i++
+        ) {
+          selectedImages.push(`/cards/${shuffledPaths[i]}`);
+        }
+
+        if (amountOfImages > shuffledPaths.length) {
+          const extraNeeded = amountOfImages - shuffledPaths.length;
+          const extraPaths = [...shuffledPaths].sort(() => Math.random() - 0.5);
+
+          for (let i = 0; i < extraNeeded; i++) {
+            selectedImages.push(`/cards/${extraPaths[i % extraPaths.length]}`);
+          }
         }
       }
 
@@ -196,6 +207,32 @@ function CardsGame() {
     } finally {
       setIsLoadingImages(false);
     }
+  };
+
+  const generateOptions = (correctImage: string): string[] => {
+    const options = new Set<string>([correctImage]);
+    const fallbackImages = imagePaths.map((path) => `/cards/${path}`);
+
+    let attempts = 0;
+    const maxAttempts = 100;
+
+    while (
+      options.size < Math.min(9, imagesToDisplay.length + 8) &&
+      attempts < maxAttempts
+    ) {
+      attempts++;
+      if (imagesToDisplay.length > 1) {
+        const randomImage =
+          imagesToDisplay[Math.floor(Math.random() * imagesToDisplay.length)];
+        options.add(randomImage);
+      } else {
+        const randomImage =
+          fallbackImages[Math.floor(Math.random() * fallbackImages.length)];
+        options.add(randomImage);
+      }
+    }
+
+    return Array.from(options).sort(() => Math.random() - 0.5);
   };
 
   const startGame = (e: React.FormEvent): void => {
@@ -209,24 +246,6 @@ function CardsGame() {
     setGameStatus(2);
     setCurrentIndex(0);
     setEndTime(Date.now());
-  };
-
-  const generateOptions = (correctImage: string): string[] => {
-    const options = new Set<string>([correctImage]);
-    const fallbackImages = imagePaths.map((path) => `/cards/${path}`);
-
-    while (options.size < Math.min(imagesToDisplay.length, 9)) {
-      const randomImage =
-        imagesToDisplay.length > 1
-          ? imagesToDisplay[Math.floor(Math.random() * imagesToDisplay.length)]
-          : fallbackImages[Math.floor(Math.random() * fallbackImages.length)];
-
-      if (!options.has(randomImage)) {
-        options.add(randomImage);
-      }
-    }
-
-    return Array.from(options).sort(() => Math.random() - 0.5);
   };
 
   const handleAnswer = (selected: string, correct: string): void => {
@@ -634,7 +653,11 @@ function CardsGame() {
             </div>
           </div>
           <Button size="full" onClick={resetGame}>
-            {isLoading ? <FaSpinner className="animate-spin" /> : "Save and Restart"}
+            {isLoading ? (
+              <FaSpinner className="animate-spin" />
+            ) : (
+              "Save and Restart"
+            )}
           </Button>
         </div>
       )}

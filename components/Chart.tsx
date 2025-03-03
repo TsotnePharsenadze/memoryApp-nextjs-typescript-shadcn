@@ -49,7 +49,7 @@ export function GameChart({ data, isLoading }: GameChartProps) {
           </div>
         </div>
       )}
-      {!isLoading && isEmpty && data.length < 2 && (
+      {!isLoading && (isEmpty || data.length < 2) && (
         <div className="absolute inset-0 flex items-center justify-center text-center">
           <div className="bg-white bg-opacity-80 p-4 rounded-md shadow-lg">
             <p className="text-lg font-semibold">
