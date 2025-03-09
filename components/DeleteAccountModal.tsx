@@ -25,6 +25,7 @@ import { z } from "zod";
 import { FaSpinner, FaTrash } from "react-icons/fa";
 import Error from "./Error";
 import { DialogDescription } from "@radix-ui/react-dialog";
+import { signOut } from "next-auth/react";
 
 export default function DeleteAccountModal() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -63,6 +64,7 @@ export default function DeleteAccountModal() {
       if (!data.success) {
         setCustomError("Something went wrong");
       } else {
+        signOut();
         closeDialog();
       }
     } catch (err) {
