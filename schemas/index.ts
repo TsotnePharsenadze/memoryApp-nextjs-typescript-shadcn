@@ -60,7 +60,7 @@ export const profileSchema = z.object({
     })
     .max(31, {
       message: "Name must contain less than 32 character(s)",
-    }),
+    }).optional(),
   surname: z
     .string()
     .min(1, {
@@ -68,7 +68,7 @@ export const profileSchema = z.object({
     })
     .max(31, {
       message: "Surname must contain less than 32 character(s)",
-    }),
+    }).optional(),
   email: z
     .string()
     .min(3, {
@@ -77,7 +77,7 @@ export const profileSchema = z.object({
     .max(50, {
       message: "Email must contain less than 51 character(s)",
     })
-    .email(),
+    .email().optional(),
   username: z
     .string()
     .min(8, {
@@ -85,7 +85,7 @@ export const profileSchema = z.object({
     })
     .max(31, {
       message: "Username must contain less than 32 character(s)",
-    }),
+    }).optional(),
 });
 
 export const passwordSchema = z.object({
