@@ -47,6 +47,19 @@ const ProfilePage = () => {
       });
 
       const data = await response.json();
+      form.reset({
+        name: data.user.name || "",
+        surname: data.user.surname || "",
+        username: data.user.username || "",
+        email: data.user.email || "",
+      });
+      setInitialValues({
+        name: data.user.name || "",
+        surname: data.user.surname || "",
+        username: data.user.username || "",
+        email: data.user.email || "",
+      });
+      setFullUserData(data.user)
     } catch (err) {
       console.log(err);
     } finally {

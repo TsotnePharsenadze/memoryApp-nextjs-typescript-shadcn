@@ -12,12 +12,12 @@ export async function POST(req: Request) {
         { status: 401 }
       );
     }
-    
+
     const body = await req.json();
     const parsedBody = await profileSchema.parseAsync(body);
 
     const newData = await prisma.user.update({
-      where: { id: currentUser.user.id },
+      where: { id: currentUser.user.id as string },
       data: { ...parsedBody },
     });
 
