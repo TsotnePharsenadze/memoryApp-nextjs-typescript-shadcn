@@ -104,12 +104,19 @@ function NumbersGame() {
   };
 
   const generateOptions = (correctNumber: string): string[] => {
+    const uniqueNumbers = new Set(numbersToDisplay);
+    uniqueNumbers.add(correctNumber);
+  
+    const maxOptions = Math.min(amountOfNumbers, uniqueNumbers.size, 9);
     const options = new Set<string>([correctNumber]);
-    while (options.size < Math.min(amountOfNumbers, 9)) {
-      const randomNumber =
-        numbersToDisplay[Math.floor(Math.random() * numbersToDisplay.length)];
-      options.add(randomNumber);
+  
+    const available = Array.from(uniqueNumbers).filter((n) => n !== correctNumber);
+  
+    while (options.size < maxOptions && available.length) {
+      const randomIndex = Math.floor(Math.random() * available.length);
+      options.add(available.splice(randomIndex, 1)[0]);
     }
+  
     return Array.from(options).sort(() => Math.random() - 0.5);
   };
 
